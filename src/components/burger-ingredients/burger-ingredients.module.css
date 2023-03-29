@@ -1,0 +1,7 @@
+.container {
+    width: 600px;
+    margin-top: 90px;
+    height: calc(100vh - 100px);
+    background: #131316;
+    border: 2px solid #4C4CFF;
+}
