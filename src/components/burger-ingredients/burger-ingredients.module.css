@@ -3,5 +3,48 @@
     margin-top: 90px;
     height: calc(100vh - 100px);
     background: #131316;
-    border: 2px solid #4C4CFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+}
+
+.components {
+    width: 568px;
+    max-height: calc(100vh - 350px);
+}
+
+.components__inside {
+    height: calc(100%);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.components__element {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.components__result {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    height: 64px;
+}
+
+.components__price {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.components__bnt {
+    height: 100%;
 }

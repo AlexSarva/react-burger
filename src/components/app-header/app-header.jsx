@@ -2,18 +2,18 @@ import headerStyle from './app-header.module.css';
 import {BurgerIcon, ListIcon, Logo, ProfileIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import {useState} from "react";
 
-const NavigationLink = (props) => {
+const NavigationLink = ({name, isActive, text, children}) => {
   return (
-    <li name={props.name} className={`${headerStyle.header__navigationElement} pl-5 pr-5`}>
-      {props.children}
-      <p className={`pl-2 text text_type_main-default ${!props.isActive && "text_color_inactive"}`}>{props.text}</p>
+    <li name={name} className={`${headerStyle.header__navigationElement} pl-5 pr-5`}>
+      {children}
+      <p className={`pl-2 text text_type_main-default ${!isActive && "text_color_inactive"}`}>{text}</p>
     </li>
   );
 }
 
-const Navigation = (props) => {
+const Navigation = ({activeState}) => {
 
-  const { isActiveConstructor, isActiveList} = props.activeState;
+  const { isActiveConstructor, isActiveList} = activeState;
 
   return (
     <ul className={headerStyle.header__navigation}>
