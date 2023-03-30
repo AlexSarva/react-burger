@@ -1,299 +1,154 @@
 import ingredientsStyle from './burger-ingredients.module.css';
-import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
+import {forwardRef, useEffect, useRef, useState} from "react";
+import {Counter, CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
+import {data} from "../../utils/data.js";
 import PropTypes from "prop-types";
 
-const compData  = [
-  {
-    "_id":"60666c42cc7b410027a1a9b1",
-    "name":"Краторная булка N-200i",
-    "type":"bun",
-    "proteins":80,
-    "fat":24,
-    "carbohydrates":53,
-    "calories":420,
-    "price":1255,
-    "image":"https://code.s3.yandex.net/react/code/bun-02.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/bun-02-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/bun-02-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b5",
-    "name":"Говяжий метеорит (отбивная)",
-    "type":"main",
-    "proteins":800,
-    "fat":800,
-    "carbohydrates":300,
-    "calories":2674,
-    "price":3000,
-    "image":"https://code.s3.yandex.net/react/code/meat-04.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/meat-04-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/meat-04-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b6",
-    "name":"Биокотлета из марсианской Магнолии",
-    "type":"main",
-    "proteins":420,
-    "fat":142,
-    "carbohydrates":242,
-    "calories":4242,
-    "price":424,
-    "image":"https://code.s3.yandex.net/react/code/meat-01.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/meat-01-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/meat-01-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b7",
-    "name":"Соус Spicy-X",
-    "type":"sauce",
-    "proteins":30,
-    "fat":20,
-    "carbohydrates":40,
-    "calories":30,
-    "price":90,
-    "image":"https://code.s3.yandex.net/react/code/sauce-02.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/sauce-02-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/sauce-02-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b4",
-    "name":"Мясо бессмертных моллюсков Protostomia",
-    "type":"main",
-    "proteins":433,
-    "fat":244,
-    "carbohydrates":33,
-    "calories":420,
-    "price":1337,
-    "image":"https://code.s3.yandex.net/react/code/meat-02.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/meat-02-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/meat-02-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b9",
-    "name":"Соус традиционный галактический",
-    "type":"sauce",
-    "proteins":42,
-    "fat":24,
-    "carbohydrates":42,
-    "calories":99,
-    "price":15,
-    "image":"https://code.s3.yandex.net/react/code/sauce-03.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/sauce-03-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/sauce-03-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b4",
-    "name":"Мясо бессмертных моллюсков Protostomia",
-    "type":"main",
-    "proteins":433,
-    "fat":244,
-    "carbohydrates":33,
-    "calories":420,
-    "price":1337,
-    "image":"https://code.s3.yandex.net/react/code/meat-02.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/meat-02-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/meat-02-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b9",
-    "name":"Соус традиционный галактический",
-    "type":"sauce",
-    "proteins":42,
-    "fat":24,
-    "carbohydrates":42,
-    "calories":99,
-    "price":15,
-    "image":"https://code.s3.yandex.net/react/code/sauce-03.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/sauce-03-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/sauce-03-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b4",
-    "name":"Мясо бессмертных моллюсков Protostomia",
-    "type":"main",
-    "proteins":433,
-    "fat":244,
-    "carbohydrates":33,
-    "calories":420,
-    "price":1337,
-    "image":"https://code.s3.yandex.net/react/code/meat-02.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/meat-02-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/meat-02-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b9",
-    "name":"Соус традиционный галактический",
-    "type":"sauce",
-    "proteins":42,
-    "fat":24,
-    "carbohydrates":42,
-    "calories":99,
-    "price":15,
-    "image":"https://code.s3.yandex.net/react/code/sauce-03.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/sauce-03-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/sauce-03-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b4",
-    "name":"Мясо бессмертных моллюсков Protostomia",
-    "type":"main",
-    "proteins":433,
-    "fat":244,
-    "carbohydrates":33,
-    "calories":420,
-    "price":1337,
-    "image":"https://code.s3.yandex.net/react/code/meat-02.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/meat-02-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/meat-02-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b9",
-    "name":"Соус традиционный галактический",
-    "type":"sauce",
-    "proteins":42,
-    "fat":24,
-    "carbohydrates":42,
-    "calories":99,
-    "price":15,
-    "image":"https://code.s3.yandex.net/react/code/sauce-03.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/sauce-03-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/sauce-03-large.png",
-    "__v":0
-  },
-  {
-    "_id":"60666c42cc7b410027a1a9b8",
-    "name":"Соус фирменный Space Sauce",
-    "type":"sauce",
-    "proteins":50,
-    "fat":22,
-    "carbohydrates":11,
-    "calories":14,
-    "price":80,
-    "image":"https://code.s3.yandex.net/react/code/sauce-04.png",
-    "image_mobile":"https://code.s3.yandex.net/react/code/sauce-04-mobile.png",
-    "image_large":"https://code.s3.yandex.net/react/code/sauce-04-large.png",
-    "__v":0
-  }]
 
-const dataPropTypes = PropTypes.arrayOf(PropTypes.shape({
-  _id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  proteins: PropTypes.number.isRequired,
-  fat: PropTypes.number.isRequired,
-  carbohydrates: PropTypes.number.isRequired,
-  calories: PropTypes.number.isRequired,
-  price: PropTypes.number.isRequired,
-  image: PropTypes.string.isRequired,
-  image_mobile: PropTypes.string.isRequired,
-  image_large: PropTypes.string.isRequired,
-  __v: PropTypes.number.isRequired,
-}));
+const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
 
+  const handleClick = (e) => {
+    onPickCategory(e);
+    refs[e].current.scrollIntoView({behavior: "smooth"});
+  }
 
-const ResultInfo = ({price}) => {
   return (
-    <div className={`${ingredientsStyle.components__result} mt-10`}>
-      <div className={`${ingredientsStyle.components__price} pt-1 pb-1 mr-10`}>
-        <span className={"text text_type_digits-medium mr-2"}>{price}</span>
+    <div className={ingredientsStyle.ingredients__navigation}>
+      <Tab value="bun" active={currentCategory === 'bun'} onClick={handleClick}>
+        Булки
+      </Tab>
+      <Tab value="sauce" active={currentCategory === 'sauce'} onClick={handleClick}>
+        Соусы
+      </Tab>
+      <Tab value="main" active={currentCategory === 'main'} onClick={handleClick}>
+        Начинки
+      </Tab>
+    </div>
+  )
+}
+
+IngredientsNavigation.propTypes = {
+  onPickCategory: PropTypes.func.isRequired,
+  currentCategory: PropTypes.string.isRequired,
+  refs: PropTypes.object.isRequired
+}
+
+const Ingredient = ({ingredient, count, onAddClick}) => {
+  const {image, price, name, _id, type} = ingredient;
+
+  const handleAddClick = () => {
+    onAddClick(_id, type);
+  }
+
+  return (
+    <li onClick={handleAddClick} className={`${ingredientsStyle.ingredient} pt-6`}>
+      <img className={`${ingredientsStyle.ingredient__image} pl-4 pr-4`} src={image} alt={name} />
+      <div className={`${ingredientsStyle.ingredient__price} pt-1 pb-1`}>
+        <span className={"text text_type_digits-default"}>{price}</span>
         <CurrencyIcon type={"primary"} />
       </div>
-      <Button htmlType="button" type="primary" size="large">
-        Оформить заказ
-      </Button>
-    </div>
+      <p className={`${ingredientsStyle.ingredient_text} pt-2`}>{name}</p>
+      {count && <Counter count={count} size="default" extraClass={ingredientsStyle.ingredient__counter} />}
+    </li>
   )
 }
 
-ResultInfo.propTypes = {
-  price: PropTypes.number.isRequired,
+Ingredient.propTypes = {
+  ingredient: PropTypes.object.isRequired,
+  count: PropTypes.number
 }
 
-const DragConstructorElement = ({ingredient}) => {
+const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount}, ref) => {
   return (
-    <div className={`${ingredientsStyle.components__element}`}>
-      <DragIcon type="primary" />
-      <ConstructorElement
-        text={ingredient.name}
-        price={ingredient.price}
-        thumbnail={ingredient.image_mobile}
-        extraClass={'ml-2'}
-      />
+    <div ref={ref} className={`${ingredientsStyle.ingredients} pt-10  custom-scroll`}>
+      <h2>{title}</h2>
+      <ul className={ingredientsStyle.ingredients__list}>
+        {ingredients && ingredients.map((ingredient) => (
+          <Ingredient key={ingredient._id}
+                      ingredient={ingredient}
+                      onAddClick={onAddClick}
+                      count={ingredientsCount[ingredient._id]}/>
+        ))}
+      </ul>
     </div>
   )
+})
+
+Ingredients.propTypes = {
+  title: PropTypes.string.isRequired,
+  ingredients: PropTypes.array.isRequired,
+  onAddClick: PropTypes.func.isRequired,
+  ingredientsCount: PropTypes.object.isRequired
 }
 
-DragConstructorElement.propTypes = {
-  ingredient: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    image_mobile: PropTypes.string.isRequired,
-    image_large: PropTypes.string.isRequired,
-  }).isRequired,
-}
-
-const BurgerComponents = ({ingredients, topBun, bottomBun}) => {
-  return (
-    <div className={`${ingredientsStyle.components} pt-25`} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center'}}>
-      <ConstructorElement
-        type="top"
-        isLocked={true}
-        text={topBun.name + ' (верх)'}
-        price={topBun.price}
-        thumbnail={topBun.image_mobile}
-        extraClass={"pl-8"}
-      />
-      <div className={`${ingredientsStyle.components__inside} custom-scroll`} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center'}}>
-        {ingredients.map((ingredient, index) => {
-          return (
-            <DragConstructorElement key={index} ingredient={ingredient}/>
-          )
-        })}
-      </div>
-      <ConstructorElement
-        type="bottom"
-        isLocked={true}
-        text={bottomBun.name + ' (низ)'}
-        price={bottomBun.price}
-        thumbnail={bottomBun.image_mobile}
-        extraClass={"pl-8"}
-      />
-    </div>
-  );
-}
-
-BurgerComponents.propTypes = {
-  ingredients: PropTypes.arrayOf(dataPropTypes).isRequired,
-  topBun: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    image_mobile: PropTypes.string.isRequired,
-    image_large: PropTypes.string.isRequired,
-  }).isRequired,
-  bottomBun: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    image_mobile: PropTypes.string.isRequired,
-    image_large: PropTypes.string.isRequired,
-  }).isRequired,
+const IngredientsMapping = {
+  bun: "Булки",
+  main: "Начинки",
+  sauce: "Соусы"
 }
 
 const BurgerIngredients = () => {
+
+  const bunRef = useRef(null);
+  const sauceRef = useRef(null);
+  const mainRef = useRef(null);
+  const [bunCount, setBunCount] = useState({});
+  const [sauceCount, setSauceCount] = useState({});
+  const [mainCount, setMainCount] = useState({});
+
+  const [state, setState] = useState({
+    buns: [],
+    mains: [],
+    sauces: []
+  });
+  const [currentCategory, setCurrentCategory] = useState('bun');
+
+  const handlePickCategory = (category) => {
+    setCurrentCategory(category);
+  }
+
+  const handleAddClick = (id, type) => {
+    if (type === 'bun') {
+      setBunCount({...bunCount, [id]: bunCount[id]? bunCount[id] + 1 : 1});
+    } else if (type === 'main') {
+      setMainCount({...mainCount, [id]: mainCount[id]? mainCount[id] + 1 : 1});
+    } else if (type === 'sauce') {
+      setSauceCount({...sauceCount, [id]: sauceCount[id]? sauceCount[id] + 1 : 1});
+    }
+  }
+
+  useEffect(() => {
+    setState({
+      buns: data.filter(item => item.type === "bun"),
+      mains: data.filter(item => item.type === "main"),
+      sauces: data.filter(item => item.type === "sauce")
+    })
+  },[])
+
+
   return (
-    <section className={ingredientsStyle.container}>
-      <BurgerComponents ingredients={compData} topBun={compData[0]} bottomBun={compData[0]}/>
-      <ResultInfo price={"1000"}/>
+    <section className={`${ingredientsStyle.container}`}>
+      <h1 className={"text text_type_main-large mt-10 mb-5"}>Соберите бургер</h1>
+      <IngredientsNavigation currentCategory={currentCategory} onPickCategory={handlePickCategory}
+      refs={{bun: bunRef, sauce: sauceRef, main: mainRef}}/>
+      <div className={`${ingredientsStyle.ingredients__container} custom-scroll`}>
+        <Ingredients ref={bunRef}
+                     title={IngredientsMapping["bun"]}
+                     ingredients={state.buns}
+                     ingredientsCount={bunCount}
+                     onAddClick={handleAddClick}
+        />
+        <Ingredients ref={sauceRef}
+                     title={IngredientsMapping["sauce"]}
+                     ingredients={state.sauces}
+                     ingredientsCount={sauceCount}
+                     onAddClick={handleAddClick}/>
+        <Ingredients ref={mainRef}
+                     title={IngredientsMapping["main"]}
+                     ingredients={state.mains}
+                     ingredientsCount={mainCount}
+                     onAddClick={handleAddClick}/>
+      </div>
     </section>
   )
 }

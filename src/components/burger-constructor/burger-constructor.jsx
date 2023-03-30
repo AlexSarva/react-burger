@@ -1,116 +1,85 @@
-import consructorStyle from './burger-constructor.module.css';
-import {forwardRef, useEffect, useRef, useState} from "react";
-import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
-import {data} from "../../utils/data.js";
+import constructorStyle from './burger-constructor.module.css';
+import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import PropTypes from "prop-types";
+import {testData} from "../../utils/data.js";
+import {ConstructorElementType} from "../../utils/types.js";
 
-
-const ConstructorNavigation = ({onPickCategory, currentCategory, refs}) => {
-
-  const handleClick = (e) => {
-    onPickCategory(e);
-    refs[e].current.scrollIntoView({behavior: "smooth"});
-  }
-
+const ResultInfo = ({price}) => {
   return (
-    <div style={{ display: 'flex' }}>
-      <Tab value="bun" active={currentCategory === 'bun'} onClick={handleClick}>
-        Булки
-      </Tab>
-      <Tab value="sauce" active={currentCategory === 'sauce'} onClick={handleClick}>
-        Соусы
-      </Tab>
-      <Tab value="main" active={currentCategory === 'main'} onClick={handleClick}>
-        Начинки
-      </Tab>
-    </div>
-  )
-}
-
-ConstructorNavigation.propTypes = {
-  onPickCategory: PropTypes.func.isRequired,
-  currentCategory: PropTypes.string.isRequired,
-  refs: PropTypes.object.isRequired
-}
-
-const Ingredient = ({ingredient}) => {
-  const {image, price, name} = ingredient;
-  return (
-    <li className={`${consructorStyle.ingredient} pt-6`}>
-      <img className={`${consructorStyle.ingredient__image} pl-4 pr-4`} src={image} alt={name} />
-      <div className={`${consructorStyle.ingredient__price} pt-1 pb-1`}>
-        <span className={"text text_type_digits-default"}>{price}</span>
+    <div className={`${constructorStyle.components__result} mt-10`}>
+      <div className={`${constructorStyle.components__price} pt-1 pb-1 mr-10`}>
+        <span className={"text text_type_digits-medium mr-2"}>{price}</span>
         <CurrencyIcon type={"primary"} />
       </div>
-      <p className={`${consructorStyle.ingredient_text} pt-2`}>{name}</p>
-    </li>
-  )
-}
-
-Ingredient.propTypes = {
-  ingredient: PropTypes.object.isRequired
-}
-
-const Ingredients = forwardRef(({title, ingredients}, ref) => {
-  return (
-    <div ref={ref} className={`${consructorStyle.ingredients} pt-10  custom-scroll`}>
-      <h2>{title}</h2>
-      <ul className={consructorStyle.ingredients__list}>
-        {ingredients && ingredients.map((ingredient) => (
-          <Ingredient key={ingredient._id} ingredient={ingredient}/>
-        ))}
-      </ul>
+      <Button htmlType="button" type="primary" size="large">
+        Оформить заказ
+      </Button>
     </div>
   )
-})
-
-Ingredients.propTypes = {
-  title: PropTypes.string.isRequired,
-  ingredients: PropTypes.array.isRequired
 }
 
-const IngredientsMapping = {
-  bun: "Булки",
-  main: "Начинки",
-  sauce: "Соусы"
+ResultInfo.propTypes = {
+  price: PropTypes.number.isRequired,
+}
+
+const DragConstructorElement = ({ingredient}) => {
+  return (
+    <div className={`${constructorStyle.components__element}`}>
+      <DragIcon type="primary" />
+      <ConstructorElement
+        text={ingredient.name}
+        price={ingredient.price}
+        thumbnail={ingredient.image_mobile}
+        extraClass={'ml-2'}
+      />
+    </div>
+  )
+}
+
+DragConstructorElement.propTypes = {
+  ingredient: ConstructorElementType,
+}
+
+const BurgerComponents = ({ingredients, bun}) => {
+  return (
+    <div className={`${constructorStyle.components} pt-25`}>
+      <ConstructorElement
+        type="top"
+        isLocked={true}
+        text={bun.name + ' (верх)'}
+        price={bun.price}
+        thumbnail={bun.image_mobile}
+        extraClass={"pl-8"}
+      />
+      <div className={`${constructorStyle.components__inside} custom-scroll`}>
+        {ingredients.map((ingredient, index) => {
+          return (
+            <DragConstructorElement key={index} ingredient={ingredient}/>
+          )
+        })}
+      </div>
+      <ConstructorElement
+        type="bottom"
+        isLocked={true}
+        text={bun.name + ' (низ)'}
+        price={bun.price}
+        thumbnail={bun.image_mobile}
+        extraClass={"pl-8"}
+      />
+    </div>
+  );
+}
+
+BurgerComponents.prototype = {
+  ingredients: PropTypes.arrayOf(ConstructorElementType),
+  bun: ConstructorElementType,
 }
 
 const BurgerConstructor = () => {
-
-  const bunRef = useRef(null);
-  const sauceRef = useRef(null);
-  const mainRef = useRef(null);
-
-  const [state, setState] = useState({
-    buns: [],
-    mains: [],
-    sauces: []
-  });
-  const [currentCategory, setCurrentCategory] = useState('bun');
-
-  const handlePickCategory = (category) => {
-    setCurrentCategory(category);
-  }
-
-  useEffect(() => {
-    setState({
-      buns: data.filter(item => item.type === "bun"),
-      mains: data.filter(item => item.type === "main"),
-      sauces: data.filter(item => item.type === "sauce")
-    })
-  },[])
-
-
   return (
-    <section className={`${consructorStyle.container}`}>
-      <h1 className={"text text_type_main-large mt-10 mb-5"}>Соберите бургер</h1>
-      <ConstructorNavigation currentCategory={currentCategory} onPickCategory={handlePickCategory}
-      refs={{bun: bunRef, sauce: sauceRef, main: mainRef}}/>
-      <div className={`${consructorStyle.ingredients__container} custom-scroll`}>
-        <Ingredients ref={bunRef} title={IngredientsMapping["bun"]} ingredients={state.buns} />
-        <Ingredients ref={sauceRef} title={IngredientsMapping["sauce"]} ingredients={state.sauces}/>
-        <Ingredients ref={mainRef} title={IngredientsMapping["main"]} ingredients={state.mains}/>
-      </div>
+    <section className={constructorStyle.container}>
+      <BurgerComponents ingredients={testData} bun={testData[0]}/>
+      <ResultInfo price={1000}/>
     </section>
   )
 }
