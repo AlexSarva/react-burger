@@ -2,6 +2,7 @@ import consructorStyle from './burger-constructor.module.css';
 import {forwardRef, useEffect, useRef, useState} from "react";
 import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import {data} from "../../utils/data.js";
+import PropTypes from "prop-types";
 
 
 const ConstructorNavigation = ({onPickCategory, currentCategory, refs}) => {
@@ -26,6 +27,12 @@ const ConstructorNavigation = ({onPickCategory, currentCategory, refs}) => {
   )
 }
 
+ConstructorNavigation.propTypes = {
+  onPickCategory: PropTypes.func.isRequired,
+  currentCategory: PropTypes.string.isRequired,
+  refs: PropTypes.object.isRequired
+}
+
 const Ingredient = ({ingredient}) => {
   const {image, price, name} = ingredient;
   return (
@@ -40,6 +47,10 @@ const Ingredient = ({ingredient}) => {
   )
 }
 
+Ingredient.propTypes = {
+  ingredient: PropTypes.object.isRequired
+}
+
 const Ingredients = forwardRef(({title, ingredients}, ref) => {
   return (
     <div ref={ref} className={`${consructorStyle.ingredients} pt-10  custom-scroll`}>
@@ -52,6 +63,11 @@ const Ingredients = forwardRef(({title, ingredients}, ref) => {
     </div>
   )
 })
+
+Ingredients.propTypes = {
+  title: PropTypes.string.isRequired,
+  ingredients: PropTypes.array.isRequired
+}
 
 const IngredientsMapping = {
   bun: "Булки",

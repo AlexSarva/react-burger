@@ -1,14 +1,21 @@
 import headerStyle from './app-header.module.css';
 import {BurgerIcon, ListIcon, Logo, ProfileIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import {useState} from "react";
+import PropTypes from "prop-types";
 
-const NavigationLink = ({name, isActive, text, children}) => {
+const NavigationLink = ({isActive, text, children}) => {
   return (
-    <li name={name} className={`${headerStyle.header__navigationElement} pl-5 pr-5`}>
+    <li className={`${headerStyle.header__navigationElement} pl-5 pr-5`}>
       {children}
       <p className={`pl-2 text text_type_main-default ${!isActive && "text_color_inactive"}`}>{text}</p>
     </li>
   );
+}
+
+NavigationLink.propTypes = {
+  isActive: PropTypes.bool.isRequired,
+  text: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
 }
 
 const Navigation = ({activeState}) => {
@@ -25,6 +32,13 @@ const Navigation = ({activeState}) => {
         </NavigationLink>
     </ul>
   );
+}
+
+Navigation.propTypes = {
+  activeState: PropTypes.shape({
+    isActiveConstructor: PropTypes.bool.isRequired,
+    isActiveList: PropTypes.bool.isRequired,
+  }).isRequired,
 }
 
 

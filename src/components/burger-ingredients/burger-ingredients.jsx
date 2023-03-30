@@ -1,5 +1,6 @@
 import ingredientsStyle from './burger-ingredients.module.css';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
+import PropTypes from "prop-types";
 
 const compData  = [
   {
@@ -185,6 +186,21 @@ const compData  = [
     "__v":0
   }]
 
+const dataPropTypes = PropTypes.arrayOf(PropTypes.shape({
+  _id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  proteins: PropTypes.number.isRequired,
+  fat: PropTypes.number.isRequired,
+  carbohydrates: PropTypes.number.isRequired,
+  calories: PropTypes.number.isRequired,
+  price: PropTypes.number.isRequired,
+  image: PropTypes.string.isRequired,
+  image_mobile: PropTypes.string.isRequired,
+  image_large: PropTypes.string.isRequired,
+  __v: PropTypes.number.isRequired,
+}));
+
 
 const ResultInfo = ({price}) => {
   return (
@@ -200,6 +216,10 @@ const ResultInfo = ({price}) => {
   )
 }
 
+ResultInfo.propTypes = {
+  price: PropTypes.number.isRequired,
+}
+
 const DragConstructorElement = ({ingredient}) => {
   return (
     <div className={`${ingredientsStyle.components__element}`}>
@@ -212,6 +232,15 @@ const DragConstructorElement = ({ingredient}) => {
       />
     </div>
   )
+}
+
+DragConstructorElement.propTypes = {
+  ingredient: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    image_mobile: PropTypes.string.isRequired,
+    image_large: PropTypes.string.isRequired,
+  }).isRequired,
 }
 
 const BurgerComponents = ({ingredients, topBun, bottomBun}) => {
@@ -242,6 +271,22 @@ const BurgerComponents = ({ingredients, topBun, bottomBun}) => {
       />
     </div>
   );
+}
+
+BurgerComponents.propTypes = {
+  ingredients: PropTypes.arrayOf(dataPropTypes).isRequired,
+  topBun: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    image_mobile: PropTypes.string.isRequired,
+    image_large: PropTypes.string.isRequired,
+  }).isRequired,
+  bottomBun: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    image_mobile: PropTypes.string.isRequired,
+    image_large: PropTypes.string.isRequired,
+  }).isRequired,
 }
 
 const BurgerIngredients = () => {
