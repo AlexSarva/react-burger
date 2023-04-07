@@ -47,7 +47,7 @@ const BurgerComponents = ({ingredients}) => {
         text={ingredients.bun.name + ' (верх)'}
         price={ingredients.bun.price}
         thumbnail={ingredients.bun.image_mobile}
-        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun} ml-7`}
+        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun} ml-8`}
       />}
       <div className={`${constructorStyle.components__inside} custom-scroll`}>
         {ingredients.options && ingredients.options.map((ingredient, index) => {
@@ -62,7 +62,7 @@ const BurgerComponents = ({ingredients}) => {
         text={ingredients.bun.name + ' (низ)'}
         price={ingredients.bun.price}
         thumbnail={ingredients.bun.image_mobile}
-        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun} ml-7`}
+        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun} ml-8`}
       />}
     </div>
   );
