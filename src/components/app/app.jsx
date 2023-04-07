@@ -3,12 +3,10 @@ import AppHeader from "../app-header/app-header";
 import BurgerIngredients from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
 import {useIngredientsAPI} from "../../hooks/use-ingredients-api";
-import ModalOverlay from "../modal-overlay/modal-overlay";
-import Modal from "../modal/modal";
-import appStyle from './app.module.css';
+import ModalIngredients from "../modal-ingredients/modal-ingredients";
 
 function App() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isIngModalOpen, setIsIngModalOpen] = useState(false);
   const [ingredients, setIngredients] = useState({
     buns: [],
     mains: [],
@@ -18,26 +16,31 @@ function App() {
     bun: null,
     options: [],
   });
+  const [ingredientInfo, setIngredientInfo] = useState({})
   const { getIngredients} = useIngredientsAPI();
 
   const pickBun = (bun) => {
     setPickedIngredients({...pickedIngredients, bun: bun})
   }
-
   const pickOption = (item) => {
     setPickedIngredients({...pickedIngredients, options: [...pickedIngredients.options, item]})
   }
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
 
   const closeModal = () => {
-    setIsModalOpen(false);
+    setIsIngModalOpen(false);
+    setIngredientInfo({})
   };
+
+  const handleIngInfo = (info) => {
+    setIngredientInfo(info)
+    setIsIngModalOpen(true);
+  }
+
 
   useEffect(() => {
     getIngredients()
       .then(({data, success}) => {
+        console.log(data);
         if (success === true) {
           setIngredients({
             buns: data.filter(item => item.type === "bun"),
@@ -51,25 +54,18 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
-  },[getIngredients])
+  },[])
 
   return (
     <>
-      <button className={appStyle.test} onClick={openModal}>Открыть</button>
       <AppHeader />
       <BurgerIngredients ingredients={ingredients}
                          onClickBun={pickBun}
                          onClickOption={pickOption}
+                         onClickIng={handleIngInfo}
       />
       <BurgerConstructor pickedIngredients={pickedIngredients} />
-      {isModalOpen && (
-        <>
-          <ModalOverlay onClick={closeModal} />
-          <Modal title="Заголовок модального окна" onClose={closeModal}>
-            <p>Содержимое модального окна</p>
-          </Modal>
-        </>
-      )}
+      {isIngModalOpen && ingredientInfo && <ModalIngredients ingredient={ingredientInfo} onClose={closeModal} />}
     </>
   );
 }

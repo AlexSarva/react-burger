@@ -31,21 +31,25 @@ IngredientsNavigation.propTypes = {
   refs: PropTypes.object.isRequired
 }
 
-const Ingredient = ({ingredient, count, onAddClick}) => {
+const Ingredient = ({ingredient, count, onAddClick, onClickIng}) => {
   const {image, price, name, _id, type} = ingredient;
 
-  const handleAddClick = () => {
+  const handleInfoClick = () => {
+    onClickIng(ingredient);
+  }
+  const handleAddClick = (e) => {
+    e.stopPropagation();
     onAddClick(_id, type, ingredient);
   }
 
   return (
-    <li onClick={handleAddClick} className={`${ingredientsStyle.ingredient} pt-6`}>
+    <li onClick={handleInfoClick} className={`${ingredientsStyle.ingredient} pt-6`}>
       <img className={`${ingredientsStyle.ingredient__image} pl-4 pr-4`} src={image} alt={name} />
       <div className={`${ingredientsStyle.ingredient__price} pt-1 pb-1`}>
         <span className={"text text_type_digits-default"}>{price}</span>
         <CurrencyIcon type={"primary"} />
       </div>
-      <p className={`${ingredientsStyle.ingredient_text} pt-2`}>{name}</p>
+      <p onClick={handleAddClick} className={`${ingredientsStyle.ingredient_text} pt-2`}>{name}</p>
       {count && <Counter count={count} size="default" extraClass={ingredientsStyle.ingredient__counter} />}
     </li>
   )
@@ -56,8 +60,7 @@ Ingredient.propTypes = {
   count: PropTypes.number
 }
 
-const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount}, ref) => {
-  console.log(ingredientsCount)
+const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount, onClickIng}, ref) => {
   return (
     <div ref={ref} className={`${ingredientsStyle.ingredients} pt-10  custom-scroll`}>
       <h2>{title}</h2>
@@ -66,6 +69,7 @@ const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCoun
           <Ingredient key={ingredient._id}
                       ingredient={ingredient}
                       onAddClick={onAddClick}
+                      onClickIng={onClickIng}
                       count={ingredientsCount[ingredient._id]}/>
         ))}
       </ul>
@@ -86,7 +90,7 @@ const IngredientsMapping = {
   sauce: "Соусы"
 }
 
-const BurgerIngredients = ({ingredients, onClickBun, onClickOption}) => {
+const BurgerIngredients = ({ingredients, onClickBun, onClickOption, onClickIng}) => {
   const bunRef = useRef(null);
   const sauceRef = useRef(null);
   const mainRef = useRef(null);
@@ -128,17 +132,22 @@ const BurgerIngredients = ({ingredients, onClickBun, onClickOption}) => {
                      ingredients={ingredients.buns}
                      ingredientsCount={bunCount}
                      onAddClick={handleAddClick}
+                     onClickIng={onClickIng}
         />
         <Ingredients ref={sauceRef}
                      title={IngredientsMapping["sauce"]}
                      ingredients={ingredients.sauces}
                      ingredientsCount={sauceCount}
-                     onAddClick={handleAddClick}/>
+                     onAddClick={handleAddClick}
+                     onClickIng={onClickIng}
+        />
         <Ingredients ref={mainRef}
                      title={IngredientsMapping["main"]}
                      ingredients={ingredients.mains}
                      ingredientsCount={mainCount}
-                     onAddClick={handleAddClick}/>
+                     onAddClick={handleAddClick}
+                     onClickIng={onClickIng}
+        />
       </div>
     </section>
   )

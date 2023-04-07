@@ -17,9 +17,11 @@ const Modal = ({ title, children, onClose }) => {
 
   return ReactDOM.createPortal(
     <div className={modalStyle.modal}>
-      <h2 className={modalStyle.modal_title}>{title}</h2>
-      <div className={modalStyle.modal_closeBtn} onClick={onClose} >
-        <CloseIcon type="primary" />
+      <div className={`${modalStyle.modal_header} mt-10`}>
+        <h2 className={`${modalStyle.modal_title} text text_type_main-large`}>{title}</h2>
+        <div className={modalStyle.modal_closeBtn} onClick={onClose} >
+          <CloseIcon type="primary" />
+        </div>
       </div>
       <div className={modalStyle.modal_body}>{children}</div>
     </div>,
