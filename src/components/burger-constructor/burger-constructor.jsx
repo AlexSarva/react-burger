@@ -1,7 +1,6 @@
 import constructorStyle from './burger-constructor.module.css';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import PropTypes from "prop-types";
-import {testData} from "../../utils/data.js";
 import {ConstructorElementType} from "../../utils/types.js";
 
 const ResultInfo = ({price}) => {
@@ -24,13 +23,12 @@ ResultInfo.propTypes = {
 
 const DragConstructorElement = ({ingredient}) => {
   return (
-    <div className={`${constructorStyle.components__element}`}>
+    <div className={`${constructorStyle.components__element} ${constructorStyle.components__element_type_option}`}>
       <DragIcon type="primary" />
       <ConstructorElement
         text={ingredient.name}
         price={ingredient.price}
         thumbnail={ingredient.image_mobile}
-        extraClass={'ml-2'}
       />
     </div>
   )
@@ -40,32 +38,32 @@ DragConstructorElement.propTypes = {
   ingredient: ConstructorElementType,
 }
 
-const BurgerComponents = ({ingredients, bun}) => {
+const BurgerComponents = ({ingredients}) => {
   return (
     <div className={`${constructorStyle.components} pt-25`}>
-      <ConstructorElement
+      {ingredients.bun && <ConstructorElement
         type="top"
         isLocked={true}
-        text={bun.name + ' (верх)'}
-        price={bun.price}
-        thumbnail={bun.image_mobile}
-        extraClass={"pl-8"}
-      />
+        text={ingredients.bun.name + ' (верх)'}
+        price={ingredients.bun.price}
+        thumbnail={ingredients.bun.image_mobile}
+        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun} ml-7`}
+      />}
       <div className={`${constructorStyle.components__inside} custom-scroll`}>
-        {ingredients.map((ingredient, index) => {
+        {ingredients.options && ingredients.options.map((ingredient, index) => {
           return (
             <DragConstructorElement key={index} ingredient={ingredient}/>
           )
         })}
       </div>
-      <ConstructorElement
+      {ingredients.bun && <ConstructorElement
         type="bottom"
         isLocked={true}
-        text={bun.name + ' (низ)'}
-        price={bun.price}
-        thumbnail={bun.image_mobile}
-        extraClass={"pl-8"}
-      />
+        text={ingredients.bun.name + ' (низ)'}
+        price={ingredients.bun.price}
+        thumbnail={ingredients.bun.image_mobile}
+        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun} ml-7`}
+      />}
     </div>
   );
 }
@@ -75,11 +73,12 @@ BurgerComponents.prototype = {
   bun: ConstructorElementType,
 }
 
-const BurgerConstructor = () => {
+const BurgerConstructor = ({pickedIngredients}) => {
   return (
     <section className={constructorStyle.container}>
-      <BurgerComponents ingredients={testData} bun={testData[0]}/>
-      <ResultInfo price={1000}/>
+      <BurgerComponents ingredients={pickedIngredients}/>
+      {(pickedIngredients.bun || pickedIngredients.options.length > 0)
+      && <ResultInfo price={1000}/>}
     </section>
   )
 }

@@ -1,9 +1,7 @@
 import ingredientsStyle from './burger-ingredients.module.css';
-import {forwardRef, useEffect, useRef, useState} from "react";
+import {forwardRef, useRef, useState} from "react";
 import {Counter, CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
-import {data} from "../../utils/data.js";
 import PropTypes from "prop-types";
-
 
 const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
 
@@ -37,7 +35,7 @@ const Ingredient = ({ingredient, count, onAddClick}) => {
   const {image, price, name, _id, type} = ingredient;
 
   const handleAddClick = () => {
-    onAddClick(_id, type);
+    onAddClick(_id, type, ingredient);
   }
 
   return (
@@ -59,6 +57,7 @@ Ingredient.propTypes = {
 }
 
 const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount}, ref) => {
+  console.log(ingredientsCount)
   return (
     <div ref={ref} className={`${ingredientsStyle.ingredients} pt-10  custom-scroll`}>
       <h2>{title}</h2>
@@ -87,8 +86,7 @@ const IngredientsMapping = {
   sauce: "Соусы"
 }
 
-const BurgerIngredients = () => {
-
+const BurgerIngredients = ({ingredients, onClickBun, onClickOption}) => {
   const bunRef = useRef(null);
   const sauceRef = useRef(null);
   const mainRef = useRef(null);
@@ -96,35 +94,28 @@ const BurgerIngredients = () => {
   const [sauceCount, setSauceCount] = useState({});
   const [mainCount, setMainCount] = useState({});
 
-  const [state, setState] = useState({
-    buns: [],
-    mains: [],
-    sauces: []
-  });
   const [currentCategory, setCurrentCategory] = useState('bun');
 
   const handlePickCategory = (category) => {
     setCurrentCategory(category);
   }
 
-  const handleAddClick = (id, type) => {
+  const handleAddClick = (id, type, ingredient) => {
     if (type === 'bun') {
-      setBunCount({...bunCount, [id]: bunCount[id]? bunCount[id] + 1 : 1});
+      onClickBun(ingredient)
+      setBunCount(() => {
+        const newCnt = {}
+        newCnt[id] = 1
+        return newCnt
+      });
     } else if (type === 'main') {
+      onClickOption(ingredient)
       setMainCount({...mainCount, [id]: mainCount[id]? mainCount[id] + 1 : 1});
     } else if (type === 'sauce') {
+      onClickOption(ingredient)
       setSauceCount({...sauceCount, [id]: sauceCount[id]? sauceCount[id] + 1 : 1});
     }
   }
-
-  useEffect(() => {
-    setState({
-      buns: data.filter(item => item.type === "bun"),
-      mains: data.filter(item => item.type === "main"),
-      sauces: data.filter(item => item.type === "sauce")
-    })
-  },[])
-
 
   return (
     <section className={`${ingredientsStyle.container}`}>
@@ -134,18 +125,18 @@ const BurgerIngredients = () => {
       <div className={`${ingredientsStyle.ingredients__container} custom-scroll`}>
         <Ingredients ref={bunRef}
                      title={IngredientsMapping["bun"]}
-                     ingredients={state.buns}
+                     ingredients={ingredients.buns}
                      ingredientsCount={bunCount}
                      onAddClick={handleAddClick}
         />
         <Ingredients ref={sauceRef}
                      title={IngredientsMapping["sauce"]}
-                     ingredients={state.sauces}
+                     ingredients={ingredients.sauces}
                      ingredientsCount={sauceCount}
                      onAddClick={handleAddClick}/>
         <Ingredients ref={mainRef}
                      title={IngredientsMapping["main"]}
-                     ingredients={state.mains}
+                     ingredients={ingredients.mains}
                      ingredientsCount={mainCount}
                      onAddClick={handleAddClick}/>
       </div>
