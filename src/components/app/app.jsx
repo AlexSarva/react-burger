@@ -7,6 +7,9 @@ import IngredientDetails from "../ingredient-details/ingredient-details";
 import OrderDetails from "../order-details/order-details";
 
 function App() {
+  const [bunCount, setBunCount] = useState({});
+  const [sauceCount, setSauceCount] = useState({});
+  const [mainCount, setMainCount] = useState({});
   const [isIngModalOpen, setIsIngModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [ingredients, setIngredients] = useState({
@@ -27,6 +30,38 @@ function App() {
   const pickOption = (item) => {
     setPickedIngredients({...pickedIngredients, options: [...pickedIngredients.options, item]})
   }
+  const addToOrder = (id, type, ingredient) => {
+    if (type === 'bun') {
+      pickBun(ingredient)
+      setBunCount(() => {
+        const newCnt = {}
+        newCnt[id] = 1
+        return newCnt
+      });
+    } else if (type === 'main') {
+      pickOption(ingredient)
+      setMainCount({...mainCount, [id]: mainCount[id]? mainCount[id] + 1 : 1});
+    } else if (type === 'sauce') {
+      pickOption(ingredient)
+      setSauceCount({...sauceCount, [id]: sauceCount[id]? sauceCount[id] + 1 : 1});
+    }
+  }
+
+  const deleteOption = (index, id) => {
+    setPickedIngredients({...pickedIngredients,
+      options: [...pickedIngredients.options.slice(0, index),
+        ...pickedIngredients.options.slice(index + 1)]})
+    setMainCount((prev) => {
+      const newCnt = {...prev}
+      newCnt[id] = prev[id]? prev[id] - 1 : 0
+      return newCnt
+    })
+    setSauceCount((prev) => {
+      const newCnt = {...prev}
+      newCnt[id] = prev[id]? prev[id] - 1 : 0
+      return newCnt
+    })
+  }
 
   const closeModal = () => {
     setIsIngModalOpen(false);
@@ -43,11 +78,9 @@ function App() {
     setIsOrderModalOpen(true);
   }
 
-
   useEffect(() => {
     getIngredients()
       .then(({data, success}) => {
-        console.log(data);
         if (success === true) {
           setIngredients({
             buns: data.filter(item => item.type === "bun"),
@@ -67,11 +100,16 @@ function App() {
     <>
       <AppHeader />
       <BurgerIngredients ingredients={ingredients}
-                         onClickBun={pickBun}
-                         onClickOption={pickOption}
+                         onAddToOrder={addToOrder}
                          onClickIng={openIngDetailsModal}
+                         bunCount={bunCount}
+                         sauceCount={sauceCount}
+                         mainCount={mainCount}
       />
-      <BurgerConstructor pickedIngredients={pickedIngredients} onOrderClick={openOrderDetailsModal}/>
+      <BurgerConstructor pickedIngredients={pickedIngredients}
+                         onOrderClick={openOrderDetailsModal}
+                         onDeleteIngredient={deleteOption}
+      />
       {isIngModalOpen && ingredientInfo && <IngredientDetails ingredient={ingredientInfo} onClose={closeModal} />}
       {isOrderModalOpen && <OrderDetails onClose={closeModal} />}
     </>

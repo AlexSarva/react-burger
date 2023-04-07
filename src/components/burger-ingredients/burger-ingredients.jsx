@@ -50,14 +50,16 @@ const Ingredient = ({ingredient, count, onAddClick, onClickIng}) => {
         <CurrencyIcon type={"primary"} />
       </div>
       <p onClick={handleAddClick} className={`${ingredientsStyle.ingredient_text} pt-2`}>{name}</p>
-      {count && <Counter count={count} size="default" extraClass={ingredientsStyle.ingredient__counter} />}
+      {(count && count > 0) ? <Counter count={count} size="default" extraClass={ingredientsStyle.ingredient__counter} /> : null}
     </li>
   )
 }
 
 Ingredient.propTypes = {
   ingredient: PropTypes.object.isRequired,
-  count: PropTypes.number
+  count: PropTypes.number,
+  onAddClick: PropTypes.func.isRequired,
+  onClickIng: PropTypes.func.isRequired
 }
 
 const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount, onClickIng}, ref) => {
@@ -90,35 +92,14 @@ const IngredientsMapping = {
   sauce: "Соусы"
 }
 
-const BurgerIngredients = ({ingredients, onClickBun, onClickOption, onClickIng}) => {
+const BurgerIngredients = ({ingredients, onAddToOrder, onClickIng, bunCount, sauceCount, mainCount}) => {
   const bunRef = useRef(null);
   const sauceRef = useRef(null);
   const mainRef = useRef(null);
-  const [bunCount, setBunCount] = useState({});
-  const [sauceCount, setSauceCount] = useState({});
-  const [mainCount, setMainCount] = useState({});
-
   const [currentCategory, setCurrentCategory] = useState('bun');
 
   const handlePickCategory = (category) => {
     setCurrentCategory(category);
-  }
-
-  const handleAddClick = (id, type, ingredient) => {
-    if (type === 'bun') {
-      onClickBun(ingredient)
-      setBunCount(() => {
-        const newCnt = {}
-        newCnt[id] = 1
-        return newCnt
-      });
-    } else if (type === 'main') {
-      onClickOption(ingredient)
-      setMainCount({...mainCount, [id]: mainCount[id]? mainCount[id] + 1 : 1});
-    } else if (type === 'sauce') {
-      onClickOption(ingredient)
-      setSauceCount({...sauceCount, [id]: sauceCount[id]? sauceCount[id] + 1 : 1});
-    }
   }
 
   return (
@@ -131,26 +112,35 @@ const BurgerIngredients = ({ingredients, onClickBun, onClickOption, onClickIng})
                      title={IngredientsMapping["bun"]}
                      ingredients={ingredients.buns}
                      ingredientsCount={bunCount}
-                     onAddClick={handleAddClick}
+                     onAddClick={onAddToOrder}
                      onClickIng={onClickIng}
         />
         <Ingredients ref={sauceRef}
                      title={IngredientsMapping["sauce"]}
                      ingredients={ingredients.sauces}
                      ingredientsCount={sauceCount}
-                     onAddClick={handleAddClick}
+                     onAddClick={onAddToOrder}
                      onClickIng={onClickIng}
         />
         <Ingredients ref={mainRef}
                      title={IngredientsMapping["main"]}
                      ingredients={ingredients.mains}
                      ingredientsCount={mainCount}
-                     onAddClick={handleAddClick}
+                     onAddClick={onAddToOrder}
                      onClickIng={onClickIng}
         />
       </div>
     </section>
   )
+}
+
+BurgerIngredients.propTypes = {
+  ingredients: PropTypes.object.isRequired,
+  onAddToOrder: PropTypes.func.isRequired,
+  onClickIng: PropTypes.func.isRequired,
+  bunCount: PropTypes.object.isRequired,
+  sauceCount: PropTypes.object.isRequired,
+  mainCount: PropTypes.object.isRequired
 }
 
 export default BurgerIngredients;

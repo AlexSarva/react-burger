@@ -20,9 +20,15 @@ const ResultInfo = ({price, onOrderClick}) => {
 
 ResultInfo.propTypes = {
   price: PropTypes.number.isRequired,
+  onOrderClick: PropTypes.func.isRequired
 }
 
-const DragConstructorElement = ({ingredient}) => {
+const DragConstructorElement = ({num, ingredient, onDeleteIngredient}) => {
+
+  const deleteIngredient = () => {
+    onDeleteIngredient(num, ingredient._id);
+  }
+
   return (
     <div className={`${constructorStyle.components__element} ${constructorStyle.components__element_type_drag}`}>
       <DragIcon type="primary" />
@@ -30,6 +36,7 @@ const DragConstructorElement = ({ingredient}) => {
         text={ingredient.name}
         price={ingredient.price}
         thumbnail={ingredient.image_mobile}
+        handleClose={deleteIngredient}
         // extraClass={}
       />
     </div>
@@ -38,9 +45,11 @@ const DragConstructorElement = ({ingredient}) => {
 
 DragConstructorElement.propTypes = {
   ingredient: ConstructorElementType,
+  num: PropTypes.number.isRequired,
+  onDeleteIngredient: PropTypes.func.isRequired
 }
 
-const BurgerComponents = ({ingredients}) => {
+const BurgerComponents = ({ingredients, onDeleteIngredient}) => {
   return (
     <div className={`${constructorStyle.components} pt-25`}>
       {ingredients.bun && <ConstructorElement
@@ -54,7 +63,10 @@ const BurgerComponents = ({ingredients}) => {
       <div className={`${constructorStyle.components__inside} custom-scroll`}>
         {ingredients.options && ingredients.options.map((ingredient, index) => {
           return (
-            <DragConstructorElement key={index} ingredient={ingredient}/>
+            <DragConstructorElement key={index}
+                                    num={index}
+                                    ingredient={ingredient}
+                                    onDeleteIngredient={onDeleteIngredient}/>
           )
         })}
       </div>
@@ -75,7 +87,7 @@ BurgerComponents.prototype = {
   bun: ConstructorElementType,
 }
 
-const BurgerConstructor = ({pickedIngredients, onOrderClick}) => {
+const BurgerConstructor = ({pickedIngredients, onOrderClick, onDeleteIngredient}) => {
 
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -89,7 +101,7 @@ const BurgerConstructor = ({pickedIngredients, onOrderClick}) => {
 
   return (
     <section className={constructorStyle.container}>
-      <BurgerComponents ingredients={pickedIngredients}/>
+      <BurgerComponents ingredients={pickedIngredients} onDeleteIngredient={onDeleteIngredient}/>
       {(pickedIngredients.bun || pickedIngredients.options.length > 0)
       && <ResultInfo onOrderClick={onOrderClick} price={totalPrice}/>}
     </section>

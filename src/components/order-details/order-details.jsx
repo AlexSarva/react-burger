@@ -3,6 +3,7 @@ import Modal from "../modal/modal";
 import React from "react";
 import modalOrderStyle from "./order-details.module.css";
 import { generateOrder } from "../../utils/utils";
+import PropTypes from "prop-types";
 
 const OrderDetails = ({onClose}) => {
   return (
@@ -17,6 +18,10 @@ const OrderDetails = ({onClose}) => {
       </Modal>
     </>
   )
+}
+
+OrderDetails.propTypes = {
+  onClose: PropTypes.func.isRequired
 }
 
 export default OrderDetails;
