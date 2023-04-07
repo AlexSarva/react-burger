@@ -2,15 +2,16 @@ import constructorStyle from './burger-constructor.module.css';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import PropTypes from "prop-types";
 import {ConstructorElementType} from "../../utils/types.js";
+import {useEffect, useState} from "react";
 
-const ResultInfo = ({price}) => {
+const ResultInfo = ({price, onOrderClick}) => {
   return (
     <div className={`${constructorStyle.components__result} mt-10`}>
       <div className={`${constructorStyle.components__price} pt-1 pb-1 mr-10`}>
         <span className={"text text_type_digits-medium mr-2"}>{price}</span>
         <CurrencyIcon type={"primary"} />
       </div>
-      <Button htmlType="button" type="primary" size="large">
+      <Button onClick={onOrderClick} htmlType="button" type="primary" size="large">
         Оформить заказ
       </Button>
     </div>
@@ -74,12 +75,23 @@ BurgerComponents.prototype = {
   bun: ConstructorElementType,
 }
 
-const BurgerConstructor = ({pickedIngredients}) => {
+const BurgerConstructor = ({pickedIngredients, onOrderClick}) => {
+
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() =>{
+    setTotalPrice(() => {
+      const bunPrice = pickedIngredients.bun ? pickedIngredients.bun.price : 0;
+      const optionsPrice = pickedIngredients.options? pickedIngredients.options.reduce((sum, option) => sum + option.price, 0) : 0;
+      return bunPrice + optionsPrice;
+    });
+  },[pickedIngredients])
+
   return (
     <section className={constructorStyle.container}>
       <BurgerComponents ingredients={pickedIngredients}/>
       {(pickedIngredients.bun || pickedIngredients.options.length > 0)
-      && <ResultInfo price={1000}/>}
+      && <ResultInfo onOrderClick={onOrderClick} price={totalPrice}/>}
     </section>
   )
 }

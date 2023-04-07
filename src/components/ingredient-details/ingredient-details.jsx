@@ -1,7 +1,7 @@
 import ModalOverlay from "../modal-overlay/modal-overlay";
 import Modal from "../modal/modal";
 import React from "react";
-import modalIngStyle from "./modal-ingredients.module.css";
+import modalIngStyle from "./ingredient-details.module.css";
 
 
 const ModalIngElement = ({element}) => {
@@ -23,9 +23,7 @@ const ModalIngElements = ({elements}) => {
   );
 }
 
-const ModalIngredients = ({onClose, ingredient}) => {
-  console.log(ingredient);
-
+const IngredientDetails = ({onClose, ingredient}) => {
   const elements = [
     {
       id: 1,
@@ -61,4 +59,4 @@ const ModalIngredients = ({onClose, ingredient}) => {
   )
 }
 
-export default ModalIngredients;
+export default IngredientDetails;

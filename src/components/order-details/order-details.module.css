@@ -1,0 +1,17 @@
+.details_number {
+    width: 520px;
+    height: 120px;
+    text-align: center;
+}
+
+.details_description {
+    width: 520px;
+    text-align: center;
+}
+
+.details_icon {
+    width: 120px;
+    height: 120px;
+    background-size: cover;
+    background: transparent url(../../images/order-details-icon.svg) no-repeat center center;
+}
