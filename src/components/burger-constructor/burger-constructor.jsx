@@ -82,9 +82,11 @@ const BurgerComponents = ({ingredients, onDeleteIngredient}) => {
   );
 }
 
-BurgerComponents.prototype = {
-  ingredients: PropTypes.arrayOf(ConstructorElementType),
-  bun: ConstructorElementType,
+BurgerComponents.propTypes = {
+  ingredients: PropTypes.shape({
+    bun: ConstructorElementType,
+    options: PropTypes.arrayOf(ConstructorElementType.isRequired)
+  })
 }
 
 const BurgerConstructor = ({pickedIngredients, onOrderClick, onDeleteIngredient}) => {

@@ -2,9 +2,10 @@ import React, {useEffect, useState} from 'react';
 import AppHeader from "../app-header/app-header";
 import BurgerIngredients from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
-import {useIngredientsAPI} from "../../hooks/use-ingredients-api";
+import {ingredientsApi} from "../../utils/ingredients-api";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import OrderDetails from "../order-details/order-details";
+import Modal from "../modal/modal";
 
 function App() {
   const [bunCount, setBunCount] = useState({});
@@ -22,7 +23,7 @@ function App() {
     options: [],
   });
   const [ingredientInfo, setIngredientInfo] = useState({})
-  const { getIngredients} = useIngredientsAPI();
+  const { getIngredients} =  ingredientsApi();
 
   const pickBun = (bun) => {
     setPickedIngredients({...pickedIngredients, bun: bun})
@@ -94,6 +95,7 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
   return (
@@ -110,8 +112,17 @@ function App() {
                          onOrderClick={openOrderDetailsModal}
                          onDeleteIngredient={deleteOption}
       />
-      {isIngModalOpen && ingredientInfo && <IngredientDetails ingredient={ingredientInfo} onClose={closeModal} />}
-      {isOrderModalOpen && <OrderDetails onClose={closeModal} />}
+
+      {isIngModalOpen && ingredientInfo && (
+        <Modal title="Детали ингредиента" onClose={closeModal}>
+          <IngredientDetails ingredient={ingredientInfo}/>
+        </Modal>
+      )}
+      {isOrderModalOpen && (
+        <Modal title="" onClose={closeModal}>
+          <OrderDetails onClose={closeModal} />
+        </Modal>
+      )}
     </>
   );
 }

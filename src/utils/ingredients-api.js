@@ -1,4 +1,4 @@
-const baseUrl = 'https://norma.nomoreparties.space/api/ingredients';
+const baseUrl = 'https://norma.nomoreparties.space/api';
 const headers = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
@@ -14,13 +14,18 @@ const checkResponse = (res) => {
   });
 };
 
-export const useIngredientsAPI = () => {
+const request = (path, options) => {
+  const url = baseUrl + path;
+  // принимает два аргумента: урл и объект опций, как и `fetch`
+  return fetch(url, options).then(checkResponse)
+}
+
+export const ingredientsApi = () => {
   const getIngredients = () => {
-    return fetch(baseUrl, {
+    return request('/ingredients', {
       headers,
       method: 'GET',
     })
-      .then(checkResponse)
   };
 
   return {
