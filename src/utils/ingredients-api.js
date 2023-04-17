@@ -28,7 +28,15 @@ export const ingredientsApi = () => {
     })
   };
 
+  const getOrderNumber = (payload) => {
+    return request('/orders', {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+  }
+
   return {
-    getIngredients,
+    getIngredients, getOrderNumber
   };
 };
