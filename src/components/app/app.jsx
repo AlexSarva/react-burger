@@ -6,8 +6,10 @@ import {ingredientsApi} from "../../utils/ingredients-api";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import OrderDetails from "../order-details/order-details";
 import Modal from "../modal/modal";
+import {IngredientsContext} from "../../services/ingredientsContext";
 
 function App() {
+  const [orderNumber, setOrderNumber] = useState(null);
   const [bunCount, setBunCount] = useState({});
   const [sauceCount, setSauceCount] = useState({});
   const [mainCount, setMainCount] = useState({});
@@ -23,7 +25,7 @@ function App() {
     options: [],
   });
   const [ingredientInfo, setIngredientInfo] = useState({})
-  const { getIngredients} =  ingredientsApi();
+  const { getIngredients, getOrderNumber } =  ingredientsApi();
 
   const pickBun = (bun) => {
     setPickedIngredients({...pickedIngredients, bun: bun})
@@ -75,8 +77,25 @@ function App() {
     setIsIngModalOpen(true);
   }
 
+  const makeOrder = () => {
+    setOrderNumber(null)
+    const bun = pickedIngredients.bun ? [pickedIngredients.bun._id, pickedIngredients.bun._id] : [];
+    const options = pickedIngredients.options.map(option => option._id);
+    getOrderNumber({ingredients: [...bun, ...options]})
+      .then((response) => {
+        setOrderNumber(response.order.number);
+      })
+      .then(() => {
+        setIsOrderModalOpen(true);
+      })
+      .catch((err) => {
+        setOrderNumber(null);
+        console.log(err);
+      })
+  }
+
   const openOrderDetailsModal = () => {
-    setIsOrderModalOpen(true);
+    makeOrder();
   }
 
   useEffect(() => {
@@ -108,10 +127,9 @@ function App() {
                          sauceCount={sauceCount}
                          mainCount={mainCount}
       />
-      <BurgerConstructor pickedIngredients={pickedIngredients}
-                         onOrderClick={openOrderDetailsModal}
-                         onDeleteIngredient={deleteOption}
-      />
+      <IngredientsContext.Provider value={{pickedIngredients, deleteOption}}>
+        <BurgerConstructor onOrderClick={openOrderDetailsModal} />
+      </IngredientsContext.Provider>
 
       {isIngModalOpen && ingredientInfo && (
         <Modal title="Детали ингредиента" onClose={closeModal}>
@@ -120,7 +138,7 @@ function App() {
       )}
       {isOrderModalOpen && (
         <Modal title="" onClose={closeModal}>
-          <OrderDetails onClose={closeModal} />
+          <OrderDetails orderNumber={orderNumber} />
         </Modal>
       )}
     </>
