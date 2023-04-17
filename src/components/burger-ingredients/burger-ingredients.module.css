@@ -43,6 +43,22 @@
     align-items: center;
     justify-content: flex-start;
     position: relative;
+    transition: opacity .3s ease-in-out;
+}
+
+/*.ingredient:hover {*/
+/*    cursor: pointer;*/
+/*    opacity: .7;*/
+/*}*/
+
+.ingredient:hover > .ingredient__image {
+    cursor: pointer;
+    opacity: .6;
+}
+
+.ingredient:hover > .ingredient__price {
+    cursor: pointer;
+    opacity: .6;
 }
 
 .ingredient__counter {
@@ -72,3 +88,6 @@
     text-align: center;
 }
 
+.ingredient_text:hover {
+    cursor: pointer;
+}

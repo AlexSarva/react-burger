@@ -1,9 +1,7 @@
 import ingredientsStyle from './burger-ingredients.module.css';
-import {forwardRef, useEffect, useRef, useState} from "react";
+import {forwardRef, useRef, useState} from "react";
 import {Counter, CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
-import {data} from "../../utils/data.js";
 import PropTypes from "prop-types";
-
 
 const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
 
@@ -33,32 +31,38 @@ IngredientsNavigation.propTypes = {
   refs: PropTypes.object.isRequired
 }
 
-const Ingredient = ({ingredient, count, onAddClick}) => {
+const Ingredient = ({ingredient, count, onAddClick, onClickIng}) => {
   const {image, price, name, _id, type} = ingredient;
 
-  const handleAddClick = () => {
-    onAddClick(_id, type);
+  const handleInfoClick = () => {
+    onClickIng(ingredient);
+  }
+  const handleAddClick = (e) => {
+    e.stopPropagation();
+    onAddClick(_id, type, ingredient);
   }
 
   return (
-    <li onClick={handleAddClick} className={`${ingredientsStyle.ingredient} pt-6`}>
+    <li onClick={handleInfoClick} className={`${ingredientsStyle.ingredient} pt-6`}>
       <img className={`${ingredientsStyle.ingredient__image} pl-4 pr-4`} src={image} alt={name} />
       <div className={`${ingredientsStyle.ingredient__price} pt-1 pb-1`}>
         <span className={"text text_type_digits-default"}>{price}</span>
         <CurrencyIcon type={"primary"} />
       </div>
-      <p className={`${ingredientsStyle.ingredient_text} pt-2`}>{name}</p>
-      {count && <Counter count={count} size="default" extraClass={ingredientsStyle.ingredient__counter} />}
+      <p onClick={handleAddClick} className={`${ingredientsStyle.ingredient_text} pt-2`}>{name}</p>
+      {(count && count > 0) ? <Counter count={count} size="default" extraClass={ingredientsStyle.ingredient__counter} /> : null}
     </li>
   )
 }
 
 Ingredient.propTypes = {
   ingredient: PropTypes.object.isRequired,
-  count: PropTypes.number
+  count: PropTypes.number,
+  onAddClick: PropTypes.func.isRequired,
+  onClickIng: PropTypes.func.isRequired
 }
 
-const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount}, ref) => {
+const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount, onClickIng}, ref) => {
   return (
     <div ref={ref} className={`${ingredientsStyle.ingredients} pt-10  custom-scroll`}>
       <h2>{title}</h2>
@@ -67,6 +71,7 @@ const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCoun
           <Ingredient key={ingredient._id}
                       ingredient={ingredient}
                       onAddClick={onAddClick}
+                      onClickIng={onClickIng}
                       count={ingredientsCount[ingredient._id]}/>
         ))}
       </ul>
@@ -87,44 +92,15 @@ const IngredientsMapping = {
   sauce: "Соусы"
 }
 
-const BurgerIngredients = () => {
-
+const BurgerIngredients = ({ingredients, onAddToOrder, onClickIng, bunCount, sauceCount, mainCount}) => {
   const bunRef = useRef(null);
   const sauceRef = useRef(null);
   const mainRef = useRef(null);
-  const [bunCount, setBunCount] = useState({});
-  const [sauceCount, setSauceCount] = useState({});
-  const [mainCount, setMainCount] = useState({});
-
-  const [state, setState] = useState({
-    buns: [],
-    mains: [],
-    sauces: []
-  });
   const [currentCategory, setCurrentCategory] = useState('bun');
 
   const handlePickCategory = (category) => {
     setCurrentCategory(category);
   }
-
-  const handleAddClick = (id, type) => {
-    if (type === 'bun') {
-      setBunCount({...bunCount, [id]: bunCount[id]? bunCount[id] + 1 : 1});
-    } else if (type === 'main') {
-      setMainCount({...mainCount, [id]: mainCount[id]? mainCount[id] + 1 : 1});
-    } else if (type === 'sauce') {
-      setSauceCount({...sauceCount, [id]: sauceCount[id]? sauceCount[id] + 1 : 1});
-    }
-  }
-
-  useEffect(() => {
-    setState({
-      buns: data.filter(item => item.type === "bun"),
-      mains: data.filter(item => item.type === "main"),
-      sauces: data.filter(item => item.type === "sauce")
-    })
-  },[])
-
 
   return (
     <section className={`${ingredientsStyle.container}`}>
@@ -134,23 +110,37 @@ const BurgerIngredients = () => {
       <div className={`${ingredientsStyle.ingredients__container} custom-scroll`}>
         <Ingredients ref={bunRef}
                      title={IngredientsMapping["bun"]}
-                     ingredients={state.buns}
+                     ingredients={ingredients.buns}
                      ingredientsCount={bunCount}
-                     onAddClick={handleAddClick}
+                     onAddClick={onAddToOrder}
+                     onClickIng={onClickIng}
         />
         <Ingredients ref={sauceRef}
                      title={IngredientsMapping["sauce"]}
-                     ingredients={state.sauces}
+                     ingredients={ingredients.sauces}
                      ingredientsCount={sauceCount}
-                     onAddClick={handleAddClick}/>
+                     onAddClick={onAddToOrder}
+                     onClickIng={onClickIng}
+        />
         <Ingredients ref={mainRef}
                      title={IngredientsMapping["main"]}
-                     ingredients={state.mains}
+                     ingredients={ingredients.mains}
                      ingredientsCount={mainCount}
-                     onAddClick={handleAddClick}/>
+                     onAddClick={onAddToOrder}
+                     onClickIng={onClickIng}
+        />
       </div>
     </section>
   )
+}
+
+BurgerIngredients.propTypes = {
+  ingredients: PropTypes.object.isRequired,
+  onAddToOrder: PropTypes.func.isRequired,
+  onClickIng: PropTypes.func.isRequired,
+  bunCount: PropTypes.object.isRequired,
+  sauceCount: PropTypes.object.isRequired,
+  mainCount: PropTypes.object.isRequired
 }
 
 export default BurgerIngredients;
