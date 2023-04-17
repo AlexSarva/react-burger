@@ -1,14 +1,15 @@
 import ingredientsStyle from './burger-ingredients.module.css';
-import {forwardRef, useRef, useState} from "react";
+import React, {forwardRef, useCallback, useMemo, useRef, useState} from "react";
 import {Counter, CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import PropTypes from "prop-types";
+import {useIngredients} from "../../hook/useIngredients";
 
 const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
 
-  const handleClick = (e) => {
+  const handleClick = useCallback((e) => {
     onPickCategory(e);
     refs[e].current.scrollIntoView({behavior: "smooth"});
-  }
+  }, [onPickCategory, refs]);
 
   return (
     <div className={ingredientsStyle.ingredients__navigation}>
@@ -31,15 +32,16 @@ IngredientsNavigation.propTypes = {
   refs: PropTypes.object.isRequired
 }
 
-const Ingredient = ({ingredient, count, onAddClick, onClickIng}) => {
+const Ingredient = ({ingredient, count, onClickIng}) => {
   const {image, price, name, _id, type} = ingredient;
+  const {addToOrder} = useIngredients();
 
   const handleInfoClick = () => {
     onClickIng(ingredient);
   }
   const handleAddClick = (e) => {
     e.stopPropagation();
-    onAddClick(_id, type, ingredient);
+    addToOrder(_id, type, ingredient);
   }
 
   return (
@@ -58,11 +60,10 @@ const Ingredient = ({ingredient, count, onAddClick, onClickIng}) => {
 Ingredient.propTypes = {
   ingredient: PropTypes.object.isRequired,
   count: PropTypes.number,
-  onAddClick: PropTypes.func.isRequired,
   onClickIng: PropTypes.func.isRequired
 }
 
-const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount, onClickIng}, ref) => {
+const Ingredients = forwardRef(({title, ingredients, ingredientsCount, onClickIng}, ref) => {
   return (
     <div ref={ref} className={`${ingredientsStyle.ingredients} pt-10  custom-scroll`}>
       <h2>{title}</h2>
@@ -70,7 +71,6 @@ const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCoun
         {ingredients && ingredients.map((ingredient) => (
           <Ingredient key={ingredient._id}
                       ingredient={ingredient}
-                      onAddClick={onAddClick}
                       onClickIng={onClickIng}
                       count={ingredientsCount[ingredient._id]}/>
         ))}
@@ -82,7 +82,6 @@ const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCoun
 Ingredients.propTypes = {
   title: PropTypes.string.isRequired,
   ingredients: PropTypes.array.isRequired,
-  onAddClick: PropTypes.func.isRequired,
   ingredientsCount: PropTypes.object.isRequired
 }
 
@@ -92,15 +91,22 @@ const IngredientsMapping = {
   sauce: "Соусы"
 }
 
-const BurgerIngredients = ({ingredients, onAddToOrder, onClickIng, bunCount, sauceCount, mainCount}) => {
+const BurgerIngredients = React.memo(function BurgerIngredients({ingredients, onClickIng}) {
   const bunRef = useRef(null);
   const sauceRef = useRef(null);
   const mainRef = useRef(null);
   const [currentCategory, setCurrentCategory] = useState('bun');
+  const {bunCount, sauceCount, mainCount} = useIngredients();
 
-  const handlePickCategory = (category) => {
+  const handlePickCategory = useCallback((category) => {
     setCurrentCategory(category);
-  }
+  }, []);
+
+  const ingredientsMemo = useMemo(() => ({
+    buns: ingredients.buns,
+    sauces: ingredients.sauces,
+    mains: ingredients.mains,
+  }), [ingredients]);
 
   return (
     <section className={`${ingredientsStyle.container}`}>
@@ -110,37 +116,30 @@ const BurgerIngredients = ({ingredients, onAddToOrder, onClickIng, bunCount, sau
       <div className={`${ingredientsStyle.ingredients__container} custom-scroll`}>
         <Ingredients ref={bunRef}
                      title={IngredientsMapping["bun"]}
-                     ingredients={ingredients.buns}
+                     ingredients={ingredientsMemo.buns}
                      ingredientsCount={bunCount}
-                     onAddClick={onAddToOrder}
                      onClickIng={onClickIng}
         />
         <Ingredients ref={sauceRef}
                      title={IngredientsMapping["sauce"]}
-                     ingredients={ingredients.sauces}
+                     ingredients={ingredientsMemo.sauces}
                      ingredientsCount={sauceCount}
-                     onAddClick={onAddToOrder}
                      onClickIng={onClickIng}
         />
         <Ingredients ref={mainRef}
                      title={IngredientsMapping["main"]}
-                     ingredients={ingredients.mains}
+                     ingredients={ingredientsMemo.mains}
                      ingredientsCount={mainCount}
-                     onAddClick={onAddToOrder}
                      onClickIng={onClickIng}
         />
       </div>
     </section>
   )
-}
+})
 
 BurgerIngredients.propTypes = {
   ingredients: PropTypes.object.isRequired,
-  onAddToOrder: PropTypes.func.isRequired,
-  onClickIng: PropTypes.func.isRequired,
-  bunCount: PropTypes.object.isRequired,
-  sauceCount: PropTypes.object.isRequired,
-  mainCount: PropTypes.object.isRequired
+  onClickIng: PropTypes.func.isRequired
 }
 
 export default BurgerIngredients;

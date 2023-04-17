@@ -11,6 +11,7 @@ const checkResponse = (res) => {
   return Promise.reject({
     status: res.status,
     statusText: res.statusText,
+    res: res,
   });
 };
 

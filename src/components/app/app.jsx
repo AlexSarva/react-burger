@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {IngredientsProvider} from "../../hoc/ingredients-provider";
 import AppHeader from "../app-header/app-header";
 import BurgerIngredients from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
@@ -6,97 +7,35 @@ import {ingredientsApi} from "../../utils/ingredients-api";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import OrderDetails from "../order-details/order-details";
 import Modal from "../modal/modal";
-import {IngredientsContext} from "../../services/ingredientsContext";
 
 function App() {
-  const [orderNumber, setOrderNumber] = useState(null);
-  const [bunCount, setBunCount] = useState({});
-  const [sauceCount, setSauceCount] = useState({});
-  const [mainCount, setMainCount] = useState({});
+  const [order, setOrder] = useState({
+    number: 0,
+    status: false
+  });
   const [isIngModalOpen, setIsIngModalOpen] = useState(false);
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [ingredients, setIngredients] = useState({
     buns: [],
     mains: [],
     sauces: []
   });
-  const [pickedIngredients, setPickedIngredients] = useState({
-    bun: null,
-    options: [],
-  });
   const [ingredientInfo, setIngredientInfo] = useState({})
-  const { getIngredients, getOrderNumber } =  ingredientsApi();
+  const { getIngredients } =  ingredientsApi();
 
-  const pickBun = (bun) => {
-    setPickedIngredients({...pickedIngredients, bun: bun})
-  }
-  const pickOption = (item) => {
-    setPickedIngredients({...pickedIngredients, options: [...pickedIngredients.options, item]})
-  }
-  const addToOrder = (id, type, ingredient) => {
-    if (type === 'bun') {
-      pickBun(ingredient)
-      setBunCount(() => {
-        const newCnt = {}
-        newCnt[id] = 1
-        return newCnt
-      });
-    } else if (type === 'main') {
-      pickOption(ingredient)
-      setMainCount({...mainCount, [id]: mainCount[id]? mainCount[id] + 1 : 1});
-    } else if (type === 'sauce') {
-      pickOption(ingredient)
-      setSauceCount({...sauceCount, [id]: sauceCount[id]? sauceCount[id] + 1 : 1});
-    }
-  }
-
-  const deleteOption = (index, id) => {
-    setPickedIngredients({...pickedIngredients,
-      options: [...pickedIngredients.options.slice(0, index),
-        ...pickedIngredients.options.slice(index + 1)]})
-    setMainCount((prev) => {
-      const newCnt = {...prev}
-      newCnt[id] = prev[id]? prev[id] - 1 : 0
-      return newCnt
-    })
-    setSauceCount((prev) => {
-      const newCnt = {...prev}
-      newCnt[id] = prev[id]? prev[id] - 1 : 0
-      return newCnt
-    })
-  }
-
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsIngModalOpen(false);
-    setIsOrderModalOpen(false);
+    setOrder({status: false, number: null});
     setIngredientInfo({})
-  };
+  }, []);
 
-  const openIngDetailsModal = (info) => {
+  const openIngDetailsModal = useCallback((info) => {
     setIngredientInfo(info)
     setIsIngModalOpen(true);
-  }
+  }, []);
 
-  const makeOrder = () => {
-    setOrderNumber(null)
-    const bun = pickedIngredients.bun ? [pickedIngredients.bun._id, pickedIngredients.bun._id] : [];
-    const options = pickedIngredients.options.map(option => option._id);
-    getOrderNumber({ingredients: [...bun, ...options]})
-      .then((response) => {
-        setOrderNumber(response.order.number);
-      })
-      .then(() => {
-        setIsOrderModalOpen(true);
-      })
-      .catch((err) => {
-        setOrderNumber(null);
-        console.log(err);
-      })
-  }
-
-  const openOrderDetailsModal = () => {
-    makeOrder();
-  }
+  const openOrderDetailsModal = ({number, status}) => {
+    setOrder({...order, number: number, status: status})
+  };
 
   useEffect(() => {
     getIngredients()
@@ -117,28 +56,32 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
+  const memoizedIngredients = useMemo(() => {
+    return {
+      buns: ingredients.buns,
+      mains: ingredients.mains,
+      sauces: ingredients.sauces,
+    };
+  }, [ingredients]);
+
   return (
     <>
       <AppHeader />
-      <BurgerIngredients ingredients={ingredients}
-                         onAddToOrder={addToOrder}
-                         onClickIng={openIngDetailsModal}
-                         bunCount={bunCount}
-                         sauceCount={sauceCount}
-                         mainCount={mainCount}
-      />
-      <IngredientsContext.Provider value={{pickedIngredients, deleteOption}}>
+      <IngredientsProvider>
+        <BurgerIngredients ingredients={memoizedIngredients}
+                           onClickIng={openIngDetailsModal}
+        />
         <BurgerConstructor onOrderClick={openOrderDetailsModal} />
-      </IngredientsContext.Provider>
+      </IngredientsProvider>
 
       {isIngModalOpen && ingredientInfo && (
         <Modal title="Детали ингредиента" onClose={closeModal}>
           <IngredientDetails ingredient={ingredientInfo}/>
         </Modal>
       )}
-      {isOrderModalOpen && (
+      {order.status === true && (
         <Modal title="" onClose={closeModal}>
-          <OrderDetails orderNumber={orderNumber} />
+          <OrderDetails orderNumber={order.number} />
         </Modal>
       )}
     </>
