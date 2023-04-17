@@ -6,6 +6,7 @@ import {ingredientsApi} from "../../utils/ingredients-api";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import OrderDetails from "../order-details/order-details";
 import Modal from "../modal/modal";
+import {IngredientsContext} from "../../services/ingredientsContext";
 
 function App() {
   const [bunCount, setBunCount] = useState({});
@@ -108,10 +109,9 @@ function App() {
                          sauceCount={sauceCount}
                          mainCount={mainCount}
       />
-      <BurgerConstructor pickedIngredients={pickedIngredients}
-                         onOrderClick={openOrderDetailsModal}
-                         onDeleteIngredient={deleteOption}
-      />
+      <IngredientsContext.Provider value={{pickedIngredients, deleteOption}}>
+        <BurgerConstructor onOrderClick={openOrderDetailsModal} />
+      </IngredientsContext.Provider>
 
       {isIngModalOpen && ingredientInfo && (
         <Modal title="Детали ингредиента" onClose={closeModal}>
