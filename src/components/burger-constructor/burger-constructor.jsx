@@ -89,7 +89,6 @@ const BurgerComponents = () => {
 const BurgerConstructor = ({onOrderClick}) => {
 
   const {pickedIngredients} = useContext(IngredientsContext);
-  console.log(pickedIngredients);
 
   const [totalPrice, setTotalPrice] = useState(0);
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import AppHeader from "../app-header/app-header";
 import BurgerIngredients from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
@@ -15,17 +15,13 @@ function App() {
   const [mainCount, setMainCount] = useState({});
   const [isIngModalOpen, setIsIngModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-  const [ingredients, setIngredients] = useState({
-    buns: [],
-    mains: [],
-    sauces: []
-  });
+
   const [pickedIngredients, setPickedIngredients] = useState({
     bun: null,
     options: [],
   });
   const [ingredientInfo, setIngredientInfo] = useState({})
-  const { getIngredients, getOrderNumber } =  ingredientsApi();
+  const { getOrderNumber } =  ingredientsApi();
 
   const pickBun = (bun) => {
     setPickedIngredients({...pickedIngredients, bun: bun})
@@ -98,29 +94,10 @@ function App() {
     makeOrder();
   }
 
-  useEffect(() => {
-    getIngredients()
-      .then(({data, success}) => {
-        if (success === true) {
-          setIngredients({
-            buns: data.filter(item => item.type === "bun"),
-            mains: data.filter(item => item.type === "main"),
-            sauces: data.filter(item => item.type === "sauce")
-          })
-        } else {
-          console.log('something went wrong');
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
-
   return (
     <>
       <AppHeader />
-      <BurgerIngredients ingredients={ingredients}
+      <BurgerIngredients
                          onAddToOrder={addToOrder}
                          onClickIng={openIngDetailsModal}
                          bunCount={bunCount}
