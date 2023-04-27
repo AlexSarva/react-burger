@@ -1,121 +1,58 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import AppHeader from "../app-header/app-header";
 import BurgerIngredients from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
-import {ingredientsApi} from "../../utils/ingredients-api";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import OrderDetails from "../order-details/order-details";
 import Modal from "../modal/modal";
-import {IngredientsContext} from "../../services/ingredientsContext";
+import {useDispatch, useSelector} from "react-redux";
+import {hideIngredientInfo} from "../../services/reducers/ingredient-info";
+import NoContent from "../no-content/no-content";
+import {clearOrder, hideOrder} from "../../services/reducers/orders";
+import {clearConstructor} from "../../services/reducers/burger-constructor";
+import {clearIngredients} from "../../services/reducers/ingredients";
+import Preloader from "../preloader/preloader";
 
 function App() {
-  const [orderNumber, setOrderNumber] = useState(null);
-  const [bunCount, setBunCount] = useState({});
-  const [sauceCount, setSauceCount] = useState({});
-  const [mainCount, setMainCount] = useState({});
-  const [isIngModalOpen, setIsIngModalOpen] = useState(false);
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-
-  const [pickedIngredients, setPickedIngredients] = useState({
-    bun: null,
-    options: [],
-  });
-  const [ingredientInfo, setIngredientInfo] = useState({})
-  const { getOrderNumber } =  ingredientsApi();
-
-  const pickBun = (bun) => {
-    setPickedIngredients({...pickedIngredients, bun: bun})
-  }
-  const pickOption = (item) => {
-    setPickedIngredients({...pickedIngredients, options: [...pickedIngredients.options, item]})
-  }
-  const addToOrder = (id, type, ingredient) => {
-    if (type === 'bun') {
-      pickBun(ingredient)
-      setBunCount(() => {
-        const newCnt = {}
-        newCnt[id] = 1
-        return newCnt
-      });
-    } else if (type === 'main') {
-      pickOption(ingredient)
-      setMainCount({...mainCount, [id]: mainCount[id]? mainCount[id] + 1 : 1});
-    } else if (type === 'sauce') {
-      pickOption(ingredient)
-      setSauceCount({...sauceCount, [id]: sauceCount[id]? sauceCount[id] + 1 : 1});
-    }
-  }
-
-  const deleteOption = (index, id) => {
-    setPickedIngredients({...pickedIngredients,
-      options: [...pickedIngredients.options.slice(0, index),
-        ...pickedIngredients.options.slice(index + 1)]})
-    setMainCount((prev) => {
-      const newCnt = {...prev}
-      newCnt[id] = prev[id]? prev[id] - 1 : 0
-      return newCnt
-    })
-    setSauceCount((prev) => {
-      const newCnt = {...prev}
-      newCnt[id] = prev[id]? prev[id] - 1 : 0
-      return newCnt
-    })
-  }
+  const dispatch = useDispatch();
+  const { itemDetails, showDetails } = useSelector((state) => state.ingredientInfo);
+  const { status, showOrder } = useSelector((state) => state.orders);
 
   const closeModal = () => {
-    setIsIngModalOpen(false);
-    setIsOrderModalOpen(false);
-    setIngredientInfo({})
+    dispatch(hideIngredientInfo());
+    dispatch(hideOrder());
+    dispatch(clearOrder());
   };
 
-  const openIngDetailsModal = (info) => {
-    setIngredientInfo(info)
-    setIsIngModalOpen(true);
-  }
+  useEffect(() => {
+    return () => {
+      if (status === 'succeeded') {
+        dispatch(clearConstructor());
+        dispatch(clearIngredients());
+      }
+    };
+  }, [dispatch, status]);
 
-  const makeOrder = () => {
-    setOrderNumber(null)
-    const bun = pickedIngredients.bun ? [pickedIngredients.bun._id, pickedIngredients.bun._id] : [];
-    const options = pickedIngredients.options.map(option => option._id);
-    getOrderNumber({ingredients: [...bun, ...options]})
-      .then((response) => {
-        setOrderNumber(response.order.number);
-      })
-      .then(() => {
-        setIsOrderModalOpen(true);
-      })
-      .catch((err) => {
-        setOrderNumber(null);
-        console.log(err);
-      })
-  }
-
-  const openOrderDetailsModal = () => {
-    makeOrder();
-  }
 
   return (
     <>
       <AppHeader />
-      <BurgerIngredients
-                         onAddToOrder={addToOrder}
-                         onClickIng={openIngDetailsModal}
-                         bunCount={bunCount}
-                         sauceCount={sauceCount}
-                         mainCount={mainCount}
-      />
-      <IngredientsContext.Provider value={{pickedIngredients, deleteOption}}>
-        <BurgerConstructor onOrderClick={openOrderDetailsModal} />
-      </IngredientsContext.Provider>
+      <BurgerIngredients />
+      <BurgerConstructor />
 
-      {isIngModalOpen && ingredientInfo && (
+      {showDetails && itemDetails && (
         <Modal title="Детали ингредиента" onClose={closeModal}>
-          <IngredientDetails ingredient={ingredientInfo}/>
+          <IngredientDetails ingredient={itemDetails}/>
         </Modal>
       )}
-      {isOrderModalOpen && (
+      {showOrder && (
         <Modal title="" onClose={closeModal}>
-          <OrderDetails orderNumber={orderNumber} />
+          {(status === 'loading')
+            ? <Preloader />
+            : (status === 'failed')
+              ? <NoContent />
+              : <OrderDetails />
+          }
         </Modal>
       )}
     </>

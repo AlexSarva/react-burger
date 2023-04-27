@@ -3,25 +3,35 @@ import {forwardRef, useEffect, useRef, useState} from "react";
 import {Counter, CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import PropTypes from "prop-types";
 import {useDispatch, useSelector} from "react-redux";
-import { fetchIngredients } from "../../services/reducers/ingredients";
+import {fetchIngredients, incrementCount} from "../../services/reducers/ingredients";
 import Preloader from "../preloader/preloader";
+import {ingredientsMapping} from "../../utils/constants";
+import {showIngredientInfo} from "../../services/reducers/ingredient-info";
+import NoContent from "../no-content/no-content";
+import {addIngredient} from "../../services/reducers/burger-constructor";
 
 const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
+
+  const [activeCategory, setActiveCategory] = useState(null);
 
   const handleClick = (e) => {
     onPickCategory(e);
     refs[e].current.scrollIntoView({behavior: "smooth"});
   }
 
+  useEffect(() => {
+    setActiveCategory(currentCategory);
+  }, [currentCategory]);
+
   return (
     <div className={ingredientsStyle.ingredients__navigation}>
-      <Tab value="bun" active={currentCategory === 'bun'} onClick={handleClick}>
+      <Tab value="bun" active={activeCategory === 'bun'} onClick={handleClick}>
         Булки
       </Tab>
-      <Tab value="sauce" active={currentCategory === 'sauce'} onClick={handleClick}>
+      <Tab value="sauce" active={activeCategory === 'sauce'} onClick={handleClick}>
         Соусы
       </Tab>
-      <Tab value="main" active={currentCategory === 'main'} onClick={handleClick}>
+      <Tab value="main" active={activeCategory === 'main'} onClick={handleClick}>
         Начинки
       </Tab>
     </div>
@@ -34,15 +44,17 @@ IngredientsNavigation.propTypes = {
   refs: PropTypes.object.isRequired
 }
 
-const Ingredient = ({ingredient, count, onAddClick, onClickIng}) => {
-  const {image, price, name, _id, type} = ingredient;
+const Ingredient = ({ingredient}) => {
+  const {image, price, name, _id, type, count} = ingredient;
+  const dispatch = useDispatch();
 
   const handleInfoClick = () => {
-    onClickIng(ingredient);
+    dispatch(showIngredientInfo({item: ingredient}));
   }
   const handleAddClick = (e) => {
     e.stopPropagation();
-    onAddClick(_id, type, ingredient);
+    dispatch(incrementCount({_id, type}))
+    dispatch(addIngredient({item: ingredient}))
   }
 
   return (
@@ -60,22 +72,18 @@ const Ingredient = ({ingredient, count, onAddClick, onClickIng}) => {
 
 Ingredient.propTypes = {
   ingredient: PropTypes.object.isRequired,
-  count: PropTypes.number,
-  onAddClick: PropTypes.func.isRequired,
-  onClickIng: PropTypes.func.isRequired
 }
 
-const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCount, onClickIng}, ref) => {
+const Ingredients = forwardRef(({type}, ref) => {
+  const title = ingredientsMapping[type];
+  const ingredients = useSelector((state) => state.ingredients.items[type]);
+
   return (
     <div ref={ref} className={`${ingredientsStyle.ingredients} pt-10  custom-scroll`}>
       <h2>{title}</h2>
       <ul className={ingredientsStyle.ingredients__list}>
         {ingredients && ingredients.map((ingredient) => (
-          <Ingredient key={ingredient._id}
-                      ingredient={ingredient}
-                      onAddClick={onAddClick}
-                      onClickIng={onClickIng}
-                      count={ingredientsCount[ingredient._id]}/>
+          <Ingredient key={ingredient._id} ingredient={ingredient} />
         ))}
       </ul>
     </div>
@@ -83,83 +91,79 @@ const Ingredients = forwardRef(({title, ingredients, onAddClick, ingredientsCoun
 })
 
 Ingredients.propTypes = {
-  title: PropTypes.string.isRequired,
-  ingredients: PropTypes.array.isRequired,
-  onAddClick: PropTypes.func.isRequired,
-  ingredientsCount: PropTypes.object.isRequired
+  type: PropTypes.string.isRequired,
 }
 
-const IngredientsMapping = {
-  bun: "Булки",
-  main: "Начинки",
-  sauce: "Соусы"
-}
-
-const BurgerIngredients = ({onAddToOrder, onClickIng, bunCount, sauceCount, mainCount}) => {
+const BurgerIngredients = () => {
 
   const dispatch = useDispatch();
-  const {buns, mains, sauces} = useSelector((state) => state.ingredients.items);
-  const ingredientsStatus = useSelector((state) => state.ingredients.status);
-
+  const {status} = useSelector((state) => state.ingredients);
+  const ingredientContainerRef = useRef(null);
   const bunRef = useRef(null);
   const sauceRef = useRef(null);
   const mainRef = useRef(null);
-  const [currentCategory, setCurrentCategory] = useState('bun');
+  const [highlightedCategory, setHighlightedCategory] = useState('bun');
+
+  const handleScroll = () => {
+    const elementPositions = {
+      bun: bunRef.current.offsetTop - ingredientContainerRef.current.offsetTop,
+      sauce: sauceRef.current.offsetTop - ingredientContainerRef.current.offsetTop,
+      main: mainRef.current.offsetTop - ingredientContainerRef.current.offsetTop,
+    };
+
+    const scrollTop = ingredientContainerRef.current.scrollTop;
+    let maxVisiblePosition = -1;
+    let visibleCategory = null;
+
+    for (const category in elementPositions) {
+      if (elementPositions[category] <= scrollTop && elementPositions[category] > maxVisiblePosition) {
+        maxVisiblePosition = elementPositions[category];
+        visibleCategory = category;
+      }
+    }
+
+    if (visibleCategory !== null && visibleCategory !== highlightedCategory) {
+      setHighlightedCategory(visibleCategory);
+    }
+  };
 
   const handlePickCategory = (category) => {
-    setCurrentCategory(category);
-  }
+    setHighlightedCategory(category);
+  };
+
 
   useEffect(() => {
-    if (ingredientsStatus === 'idle') {
+    if (status === 'idle') {
       dispatch(fetchIngredients());
     }
-  }, [ingredientsStatus, dispatch]);
+  }, [status, dispatch]);
+
+  useEffect(() => {
+    const ingredientContainer = ingredientContainerRef.current;
+    ingredientContainer.addEventListener('scroll', handleScroll);
+    return () => ingredientContainer.removeEventListener('scroll', handleScroll);
+  });
 
   return (
     <section className={`${ingredientsStyle.container}`}>
       <h1 className={"text text_type_main-large mt-10 mb-5"}>Соберите бургер</h1>
-      <IngredientsNavigation currentCategory={currentCategory} onPickCategory={handlePickCategory}
+      <IngredientsNavigation currentCategory={highlightedCategory} onPickCategory={handlePickCategory}
       refs={{bun: bunRef, sauce: sauceRef, main: mainRef}}/>
-      <div className={`${ingredientsStyle.ingredients__container} custom-scroll`}>
-        {ingredientsStatus === 'loading'
+      <div ref={ingredientContainerRef} className={`${ingredientsStyle.ingredients__container} custom-scroll`}>
+        {status === 'loading'
           ? <Preloader />
-          :
-          <>
-            <Ingredients ref={bunRef}
-                         title={IngredientsMapping["bun"]}
-                         ingredients={buns}
-                         ingredientsCount={bunCount}
-                         onAddClick={onAddToOrder}
-                         onClickIng={onClickIng}
-            />
-            <Ingredients ref={sauceRef}
-                         title={IngredientsMapping["sauce"]}
-                         ingredients={sauces}
-                         ingredientsCount={sauceCount}
-                         onAddClick={onAddToOrder}
-                         onClickIng={onClickIng}
-            />
-            <Ingredients ref={mainRef}
-                         title={IngredientsMapping["main"]}
-                         ingredients={mains}
-                         ingredientsCount={mainCount}
-                         onAddClick={onAddToOrder}
-                         onClickIng={onClickIng}
-            />
-          </>
+          : (status === 'failed')
+            ? <NoContent />
+            :
+            <>
+              <Ingredients ref={bunRef} type={"bun"}/>
+              <Ingredients ref={sauceRef} type={"sauce"}/>
+              <Ingredients ref={mainRef} type={"main"}/>
+            </>
         }
       </div>
     </section>
   )
-}
-
-BurgerIngredients.propTypes = {
-  onAddToOrder: PropTypes.func.isRequired,
-  onClickIng: PropTypes.func.isRequired,
-  bunCount: PropTypes.object.isRequired,
-  sauceCount: PropTypes.object.isRequired,
-  mainCount: PropTypes.object.isRequired
 }
 
 export default BurgerIngredients;

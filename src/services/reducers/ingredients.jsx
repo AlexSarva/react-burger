@@ -3,41 +3,79 @@ import { ingredientsApi } from "../../utils/ingredients-api";
 
 const { getIngredients } = ingredientsApi();
 
-export const fetchIngredients = createAsyncThunk('ingredients/fetch', async () => {
-
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  const response = await getIngredients()
-  return response.data
-})
+export const fetchIngredients = createAsyncThunk('ingredients/fetch', async (_, thunkAPI) => {
+  try {
+    return await getIngredients();
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error);
+  }
+});
 
 const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState: {
     items: {
-      buns: [],
-      mains: [],
-      sauces: []
+      bun: [],
+      main: [],
+      sauce: []
     },
     status: 'idle',
     error: null,
   },
-  reducers: {},
-  extraReducers: {
-    [fetchIngredients.pending]: (state, action) => {
-      state.status = 'loading'
+  reducers: {
+    incrementCount: (state, action) => {
+      const { _id, type } = action.payload;
+      if (type === 'bun') {
+        state.items.bun.forEach((item) => {
+          item.count = 0;
+        });
+      }
+      const item = state.items[type].find((item) => item._id === _id);
+      if (item) {
+        item.count = (item.count || 0) + 1;
+      }
     },
-    [fetchIngredients.fulfilled]: (state, action) => {
-      state.items.buns = action.payload.filter(item => item.type === 'bun')
-      state.items.mains = action.payload.filter(item => item.type === 'main')
-      state.items.sauces = action.payload.filter(item => item.type === 'sauce')
-      state.status = 'succeeded'
+    decrementCount: (state, action) => {
+      const { _id, type } = action.payload;
+      const item = state.items[type].find((item) => item._id === _id);
+      if (item && item.count > 0) {
+        item.count -= 1;
+      }
     },
-    [fetchIngredients.rejected]: (state, action) => {
-      state.status = 'failed'
-      state.error = action.error.message
+    // TODO: или можно чистить просто счетчики количества ингредиентов
+    clearIngredients: (state) => {
+      state.items = {
+        bun: [],
+        main: [],
+        sauce: []
+      };
+      state.status = 'idle';
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchIngredients.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(fetchIngredients.fulfilled, (state, action) => {
+        if (action.payload.success === true ) {
+          state.items.bun = action.payload.data.filter(item => item.type === 'bun')
+          state.items.main = action.payload.data.filter(item => item.type === 'main')
+          state.items.sauce = action.payload.data.filter(item => item.type === 'sauce')
+          state.status = 'succeeded'
+        } else {
+          state.status = 'failed'
+          state.error = `Error success: ${action.payload.success}`
+        }
+      })
+      .addCase(fetchIngredients.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = `${action.error.message} > Error Code ${action.payload.statusCode}: ${action.payload.statusText}`
+      })
   }
+
 });
 
+export const { incrementCount, decrementCount, clearIngredients } = ingredientsSlice.actions;
 export default ingredientsSlice.reducer;

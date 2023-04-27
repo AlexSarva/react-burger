@@ -2,45 +2,50 @@ import constructorStyle from './burger-constructor.module.css';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import PropTypes from "prop-types";
 import {ConstructorElementType} from "../../utils/types.js";
-import {useContext, useEffect, useState} from "react";
-import {IngredientsContext} from "../../services/ingredientsContext";
+import {useDispatch, useSelector} from "react-redux";
+import {removeIngredient} from "../../services/reducers/burger-constructor";
+import {decrementCount} from "../../services/reducers/ingredients";
+import {fetchOrder} from "../../services/reducers/orders";
 
-const ResultInfo = ({price, onOrderClick}) => {
+const ResultInfo = () => {
+
+  const {totalPrice, ingredients} = useSelector((state) => state.burgerConstructor);
+  const dispatch = useDispatch();
+  const handleOrderClick = () => {
+    dispatch(fetchOrder({ingredients: ingredients}));
+  }
+
   return (
     <div className={`${constructorStyle.components__result} mt-10`}>
       <div className={`${constructorStyle.components__price} pt-1 pb-1 mr-10`}>
-        <span className={"text text_type_digits-medium mr-2"}>{price}</span>
+        <span className={"text text_type_digits-medium mr-2"}>{totalPrice}</span>
         <CurrencyIcon type={"primary"} />
       </div>
-      <Button onClick={onOrderClick} htmlType="button" type="primary" size="large">
+      <Button onClick={handleOrderClick} htmlType="button" type="primary" size="large">
         Оформить заказ
       </Button>
     </div>
   )
 }
 
-ResultInfo.propTypes = {
-  price: PropTypes.number.isRequired,
-  onOrderClick: PropTypes.func.isRequired
-}
+const DragConstructorElement = ({index, ingredient}) => {
 
-const DragConstructorElement = ({num, ingredient}) => {
+  const {_id, type, name, price, image_mobile } = ingredient;
+  const dispatch = useDispatch();
 
-  const {deleteOption} = useContext(IngredientsContext);
-
-  const deleteIngredient = () => {
-    deleteOption(num, ingredient._id);
+  const handleDelete = () => {
+    dispatch(removeIngredient({index, item: ingredient}));
+    dispatch(decrementCount({_id, type}));
   }
 
   return (
     <div className={`${constructorStyle.components__element} ${constructorStyle.components__element_type_drag}`}>
       <DragIcon type="primary" />
       <ConstructorElement
-        text={ingredient.name}
-        price={ingredient.price}
-        thumbnail={ingredient.image_mobile}
-        handleClose={deleteIngredient}
-        // extraClass={}
+        text={name}
+        price={price}
+        thumbnail={image_mobile}
+        handleClose={handleDelete}
       />
     </div>
   )
@@ -48,69 +53,54 @@ const DragConstructorElement = ({num, ingredient}) => {
 
 DragConstructorElement.propTypes = {
   ingredient: ConstructorElementType,
-  num: PropTypes.number.isRequired
+  index: PropTypes.number.isRequired
 }
 
 const BurgerComponents = () => {
 
-  const {pickedIngredients} = useContext(IngredientsContext);
+  const { bun, options} = useSelector((state) => state.burgerConstructor);
 
   return (
     <div className={`${constructorStyle.components} pt-25`}>
-      {pickedIngredients.bun && <ConstructorElement
+      {bun && <ConstructorElement
         type="top"
         isLocked={true}
-        text={pickedIngredients.bun.name + ' (верх)'}
-        price={pickedIngredients.bun.price}
-        thumbnail={pickedIngredients.bun.image_mobile}
+        text={bun.name + ' (верх)'}
+        price={bun.price}
+        thumbnail={bun.image_mobile}
         extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun}`}
       />}
       <div className={`${constructorStyle.components__inside} custom-scroll`}>
-        {pickedIngredients.options && pickedIngredients.options.map((ingredient, index) => {
+        {options && options.map((ingredient, index) => {
           return (
             <DragConstructorElement key={index}
-                                    num={index}
+                                    index={index}
                                     ingredient={ingredient}/>
           )
         })}
       </div>
-      {pickedIngredients.bun && <ConstructorElement
+      {bun && <ConstructorElement
         type="bottom"
         isLocked={true}
-        text={pickedIngredients.bun.name + ' (низ)'}
-        price={pickedIngredients.bun.price}
-        thumbnail={pickedIngredients.bun.image_mobile}
+        text={bun.name + ' (низ)'}
+        price={bun.price}
+        thumbnail={bun.image_mobile}
         extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun}`}
       />}
     </div>
   );
 }
 
-const BurgerConstructor = ({onOrderClick}) => {
+const BurgerConstructor = () => {
 
-  const {pickedIngredients} = useContext(IngredientsContext);
-
-  const [totalPrice, setTotalPrice] = useState(0);
-
-  useEffect(() =>{
-    setTotalPrice(() => {
-      const bunPrice = pickedIngredients.bun ? pickedIngredients.bun.price * 2 : 0;
-      const optionsPrice = pickedIngredients.options? pickedIngredients.options.reduce((sum, option) => sum + option.price, 0) : 0;
-      return bunPrice + optionsPrice;
-    });
-  },[pickedIngredients])
+  const { show } = useSelector((state) => state.burgerConstructor);
 
   return (
     <section className={constructorStyle.container}>
       <BurgerComponents />
-      {(pickedIngredients.bun || pickedIngredients.options.length > 0)
-      && <ResultInfo onOrderClick={onOrderClick} price={totalPrice}/>}
+      {show && <ResultInfo />}
     </section>
   )
-}
-
-BurgerConstructor.propTypes = {
-  onOrderClick: PropTypes.func.isRequired
 }
 
 export default BurgerConstructor;
