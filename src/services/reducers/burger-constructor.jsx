@@ -51,6 +51,13 @@ const constructorSlice = createSlice({
       handleShow(state);
       fillIngredients(state);
     },
+    changePlaceIngredient: (state, action) => {
+      const { dragIndex, hoverIndex } = action.payload;
+      const dragItem = state.options[dragIndex];
+      state.options.splice(dragIndex, 1);
+      state.options.splice(hoverIndex, 0, dragItem);
+      fillIngredients(state);
+    },
     clearConstructor: (state) => {
       state.bun = null;
       state.options = [];
@@ -65,5 +72,6 @@ export const {
   addIngredient,
   removeIngredient,
   clearConstructor,
+  changePlaceIngredient,
 } = constructorSlice.actions;
 export default constructorSlice.reducer;

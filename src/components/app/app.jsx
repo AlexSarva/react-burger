@@ -1,4 +1,6 @@
 import React, {useEffect} from 'react';
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import AppHeader from "../app-header/app-header";
 import BurgerIngredients from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
@@ -37,14 +39,17 @@ function App() {
   return (
     <>
       <AppHeader />
-      <BurgerIngredients />
-      <BurgerConstructor />
+      <DndProvider backend={HTML5Backend}>
+        <BurgerIngredients />
+        <BurgerConstructor />
+      </DndProvider>
 
       {showDetails && itemDetails && (
         <Modal title="Детали ингредиента" onClose={closeModal}>
           <IngredientDetails ingredient={itemDetails}/>
         </Modal>
       )}
+
       {showOrder && (
         <Modal title="" onClose={closeModal}>
           {(status === 'loading')

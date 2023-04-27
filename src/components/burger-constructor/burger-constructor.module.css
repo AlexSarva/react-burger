@@ -21,13 +21,18 @@
 
 .components__inside {
     width: 100%;
-    height: calc(100%);
+    max-height: calc(100%);
+    min-height: 300px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     align-items: center;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.components__inside_hover {
+    outline: 2px solid #4C4CFF;
 }
 
 .components__element {

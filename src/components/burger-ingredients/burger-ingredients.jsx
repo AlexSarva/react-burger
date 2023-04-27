@@ -8,7 +8,8 @@ import Preloader from "../preloader/preloader";
 import {ingredientsMapping} from "../../utils/constants";
 import {showIngredientInfo} from "../../services/reducers/ingredient-info";
 import NoContent from "../no-content/no-content";
-import {addIngredient} from "../../services/reducers/burger-constructor";
+import {addIngredient, removeIngredient} from "../../services/reducers/burger-constructor";
+import {useDrag, useDrop} from "react-dnd";
 
 const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
 
@@ -47,6 +48,14 @@ IngredientsNavigation.propTypes = {
 const Ingredient = ({ingredient}) => {
   const {image, price, name, _id, type, count} = ingredient;
   const dispatch = useDispatch();
+  const [{isDrag, opacity}, dragRef] = useDrag({
+    type: 'ingredient',
+    item: ingredient,
+    collect: monitor => ({
+      isDrag: monitor.isDragging(),
+      opacity: monitor.isDragging() ? 0.5 : 1
+    })
+  });
 
   const handleInfoClick = () => {
     dispatch(showIngredientInfo({item: ingredient}));
@@ -58,7 +67,7 @@ const Ingredient = ({ingredient}) => {
   }
 
   return (
-    <li onClick={handleInfoClick} className={`${ingredientsStyle.ingredient} pt-6`}>
+    <li ref={dragRef} onClick={handleInfoClick} className={`${ingredientsStyle.ingredient} pt-6`} style={{opacity}}>
       <img className={`${ingredientsStyle.ingredient__image} pl-4 pr-4`} src={image} alt={name} />
       <div className={`${ingredientsStyle.ingredient__price} pt-1 pb-1`}>
         <span className={"text text_type_digits-default"}>{price}</span>
@@ -103,6 +112,17 @@ const BurgerIngredients = () => {
   const sauceRef = useRef(null);
   const mainRef = useRef(null);
   const [highlightedCategory, setHighlightedCategory] = useState('bun');
+
+
+  const [{isHover}, dropTarget] = useDrop({
+    accept: "ingredient",
+    drop(item) {
+      dispatch(removeIngredient({item: item.ingredient, index: item.index}));
+    },
+    collect: monitor => ({
+      isHover: monitor.isOver(),
+    })
+  });
 
   const handleScroll = () => {
     const elementPositions = {
@@ -155,11 +175,11 @@ const BurgerIngredients = () => {
           : (status === 'failed')
             ? <NoContent />
             :
-            <>
+            <div ref={dropTarget}>
               <Ingredients ref={bunRef} type={"bun"}/>
               <Ingredients ref={sauceRef} type={"sauce"}/>
               <Ingredients ref={mainRef} type={"main"}/>
-            </>
+            </div>
         }
       </div>
     </section>
