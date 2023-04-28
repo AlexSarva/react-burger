@@ -42,15 +42,17 @@ const ingredientsSlice = createSlice({
         item.count -= 1;
       }
     },
-    // TODO: или можно чистить просто счетчики количества ингредиентов
     clearIngredients: (state) => {
-      state.items = {
-        bun: [],
-        main: [],
-        sauce: []
-      };
-      state.status = 'idle';
-    }
+      state.items.bun.forEach((item) => {
+        item.count = 0;
+      });
+      state.items.main.forEach((item) => {
+        item.count = 0;
+      });
+      state.items.sauce.forEach((item) => {
+        item.count = 0;
+      });
+    },
   },
   extraReducers: (builder) => {
     builder

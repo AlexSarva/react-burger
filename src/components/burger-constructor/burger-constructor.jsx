@@ -3,10 +3,16 @@ import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/
 import PropTypes from "prop-types";
 import {ConstructorElementType} from "../../utils/types.js";
 import {useDispatch, useSelector} from "react-redux";
-import {addIngredient, changePlaceIngredient, removeIngredient} from "../../services/reducers/burger-constructor";
-import {decrementCount} from "../../services/reducers/ingredients";
+import {
+  addIngredient,
+  onDrop,
+  removeIngredient,
+  setDropIndex,
+} from "../../services/reducers/burger-constructor";
+import {decrementCount, incrementCount} from "../../services/reducers/ingredients";
 import {fetchOrder} from "../../services/reducers/orders";
 import {useDrag, useDrop} from "react-dnd";
+import {useRef, useState} from "react";
 
 const ResultInfo = () => {
 
@@ -30,44 +36,92 @@ const ResultInfo = () => {
 }
 
 const DragConstructorElement = ({index, ingredient}) => {
-
+  const ref = useRef(null);
+  const [pickedType, setPickedType] = useState(null);
   const {_id, type, name, price, image_mobile } = ingredient;
   const dispatch = useDispatch();
-  const [{isDragging}, dragPicked] = useDrag(
-    () => ({
+  const { position } = useSelector((state) => state.burgerConstructor.dragDropIndexes);
+  const [{isDragging}, dragPicked] = useDrag({
     type: 'pickedIngredient',
-    item: {ingredient, originalIndex: index},
-    collect: monitor => ({
-      isDragging: monitor.isDragging()
-    }),
-    end: (item, monitor) => {
-      const { originalIndex } = item
-      const didDrop = monitor.didDrop()
-      if (!didDrop) {
-        dispatch(changePlaceIngredient({ dragIndex: originalIndex, hoverIndex: originalIndex }))
+    item: () => {
+      return { index, ingredientType: 'exist', ingredient}
+    },
+    collect: (monitor) => ({
+    isDragging: monitor.isDragging(),
+  }),
+  }
+);
+
+  const [{ isOver}, dropPicked] = useDrop({
+    accept: 'pickedIngredient',
+    collect(monitor) {
+      return {
+        isOver: monitor.isOver(),
       }
     },
-  }), [dispatch, index]);
+    hover(item, monitor) {
+      setPickedType(item.ingredient.type);
+      if (item.ingredient.type === 'bun') {
+        return
+      }
+      if (!ref.current) {
+        return
+      }
+      const dragIndex = item.index
+      const dropIndex = index
+      if (dragIndex === dropIndex) {
+        return
+      }
 
-  const [, dropPicked] = useDrop(
-    () => ({
-      accept: 'pickedIngredient',
-      hover({originalIndex: dragIndex}) {
-        if (dragIndex !== index) {
-          dispatch(changePlaceIngredient({dragIndex, hoverIndex: index}));
-        }
-      },
-    }),
-    [],
-  )
+      const hoverBoundingRect = ref.current?.getBoundingClientRect()
+
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+
+      const clientOffset = monitor.getClientOffset()
+
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top
+
+      if (dragIndex < dropIndex && hoverClientY < hoverMiddleY) {
+        return
+      }
+      // Dragging upwards
+      if (dragIndex > dropIndex && hoverClientY > hoverMiddleY) {
+        return
+      }
+
+      dispatch(setDropIndex({
+        dropIndex: hoverClientY < hoverMiddleY ? dropIndex : (dropIndex + 1),
+        position: hoverClientY < hoverMiddleY ? 'top' : 'bottom'
+      }))
+
+    },
+    drop({index, ingredientType, ingredient} ) {
+      if (ingredientType === 'exist') {
+        dispatch(onDrop({dragIndex: index}))
+      } else {
+        dispatch(addIngredient({item: ingredient}));
+        dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
+      }
+    }
+  })
 
   const handleDelete = () => {
     dispatch(removeIngredient({index, item: ingredient}));
     dispatch(decrementCount({_id, type}));
   }
 
+  const opacity = isDragging ? 0 : 1
+  const display = isDragging ? 'none' : ''
+  const padding = pickedType !== 'bun' && isOver ? (position === 'top') ? '7px 0 0 0' : '0 0 7px 0' : ''
+  const borderTop = pickedType !== 'bun' && isOver ? (position === 'top') ? '3px solid #4C4CFF' : '' : ''
+  const borderBottom = pickedType !== 'bun' && isOver ? (position === 'bottom') ? '3px solid #4C4CFF' : '' : ''
+  dragPicked(dropPicked(ref))
+
   return (
-    <div ref={(node) => dragPicked(dropPicked(node))} className={`${constructorStyle.components__element} ${constructorStyle.components__element_type_drag}`}>
+    <div ref={ref}
+         className={`${constructorStyle.components__element} ${constructorStyle.components__element_type_drag}`}
+         style={{ opacity, padding, display, borderTop, borderBottom }}>
       <DragIcon type="primary" />
       <ConstructorElement
         text={name}
@@ -85,23 +139,36 @@ DragConstructorElement.propTypes = {
 }
 
 const BurgerComponents = () => {
-
+  const [usedType, setUsedType] = useState(null);
   const { bun, options} = useSelector((state) => state.burgerConstructor);
   const dispatch = useDispatch();
   const [{isHover}, dropTarget] = useDrop({
-    accept: "ingredient",
-    drop(ingredient) {
-      dispatch(addIngredient({item: ingredient}));
+    accept: "pickedIngredient",
+    drop({ingredient}) {
+      if (ingredient.type === 'bun') {
+        dispatch(addIngredient({item: ingredient}));
+        dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
+      }
+      if (options.length === 0) {
+        dispatch(addIngredient({item: ingredient}));
+        dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
+      }
     },
-    collect: monitor => ({
-      isHover: monitor.isOver(),
+    hover({ingredient}) {
+      setUsedType(ingredient.type);
+    },
+    collect(monitor) {
+      return ({
+        isHover: (usedType === 'bun' || options.length === 0) && monitor.isOver(),
     })
+    }
   });
 
-
+  // const outline = isHover ? '2px solid #4C4CFF' : '';
+  const outline = isHover ? '2px solid #4C4CFF' : '';
 
   return (
-    <div ref={dropTarget} className={`${constructorStyle.components} pt-25`}>
+    <div ref={dropTarget} className={`${constructorStyle.components}`} style={{outline}}>
       {bun && <ConstructorElement
         type="top"
         isLocked={true}
@@ -110,7 +177,7 @@ const BurgerComponents = () => {
         thumbnail={bun.image_mobile}
         extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun}`}
       />}
-      <div className={`${constructorStyle.components__inside} custom-scroll ${isHover && constructorStyle.components__inside_hover}`}>
+      <div className={`${constructorStyle.components__inside} custom-scroll`}>
         {options && options.map((ingredient, index) => {
           return (
             <DragConstructorElement key={index}
@@ -125,20 +192,48 @@ const BurgerComponents = () => {
         text={bun.name + ' (низ)'}
         price={bun.price}
         thumbnail={bun.image_mobile}
-        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun}`}
+        extraClass={`${constructorStyle.components__element} ${constructorStyle.components__element_type_bun} ${constructorStyle.components__element_bottom}`}
       />}
     </div>
   );
 }
 
+const EmptyConstructor = () => {
+  const { options} = useSelector((state) => state.burgerConstructor);
+  const dispatch = useDispatch();
+  const [{isHover}, dropTarget] = useDrop({
+    accept: "pickedIngredient",
+    drop({ingredient}) {
+      if (options.length === 0) {
+        dispatch(addIngredient({item: ingredient}));
+        dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
+      }
+    },
+    collect: monitor => ({
+      isHover: options.length === 0 && monitor.isOver(),
+    })
+  });
+
+  const outline = isHover ? '2px solid #4C4CFF' : '';
+
+  return (
+    <div ref={dropTarget} className={constructorStyle.empty} style={{outline}}>
+      <p className={`text text_type_main-large text_color_inactive mb-5`}>Перетащите сюда</p>
+      <p className={`text text_type_main-large text_color_inactive`}>ингредиенты</p>
+    </div>
+  )
+}
+
 const BurgerConstructor = () => {
 
-  const { show } = useSelector((state) => state.burgerConstructor);
+  const { bun, options } = useSelector((state) => state.burgerConstructor);
 
   return (
     <section className={constructorStyle.container}>
-      <BurgerComponents />
-      {show && <ResultInfo />}
+      <div className={constructorStyle.constructor}>
+        {!bun && options.length === 0 ? <EmptyConstructor /> : <BurgerComponents />}
+      </div>
+      <ResultInfo />
     </section>
   )
 }

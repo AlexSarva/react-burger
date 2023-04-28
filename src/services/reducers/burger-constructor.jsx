@@ -27,14 +27,40 @@ const constructorSlice = createSlice({
     totalPrice: 0,
     show: false,
     ingredients: [],
+    dragDropIndexes: {
+      dropIndex: null,
+      position: ''
+    }
   },
   reducers: {
+    setDropIndex: (state, action) => {
+      const { dropIndex, position } = action.payload;
+      state.dragDropIndexes.dropIndex = dropIndex;
+      state.dragDropIndexes.position = position;
+    },
+    onDrop: (state, action) => {
+      const { dragIndex } = action.payload;
+      const { dropIndex, position } = state.dragDropIndexes;
+      const dragItem = state.options[dragIndex];
+      state.options.splice(dragIndex, 1);
+      if (position === 'top') {
+        state.options.splice(dropIndex, 0, dragItem);
+      } else {
+        state.options.splice(dropIndex, 0, dragItem);
+      }
+      // state.options.splice(dropIndex, 0, dragItem);
+      state.dragDropIndexes.dropIndex = null;
+      fillIngredients(state);
+    },
     addIngredient: (state, action) => {
       const { item } = action.payload;
+      const { dropIndex } = state.dragDropIndexes;
       if (item.type === "bun") {
         state.bun = item;
-      } else {
+      } else if (state.options.length === 0) {
         state.options.push(item);
+      } else {
+        state.options.splice(dropIndex, 0, item);
       }
       updateTotalPrice(state);
       handleShow(state);
@@ -51,13 +77,6 @@ const constructorSlice = createSlice({
       handleShow(state);
       fillIngredients(state);
     },
-    changePlaceIngredient: (state, action) => {
-      const { dragIndex, hoverIndex } = action.payload;
-      const dragItem = state.options[dragIndex];
-      state.options.splice(dragIndex, 1);
-      state.options.splice(hoverIndex, 0, dragItem);
-      fillIngredients(state);
-    },
     clearConstructor: (state) => {
       state.bun = null;
       state.options = [];
@@ -72,6 +91,7 @@ export const {
   addIngredient,
   removeIngredient,
   clearConstructor,
-  changePlaceIngredient,
+  setDropIndex,
+  onDrop
 } = constructorSlice.actions;
 export default constructorSlice.reducer;
