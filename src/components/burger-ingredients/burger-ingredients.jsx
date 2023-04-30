@@ -1,16 +1,18 @@
 import ingredientsStyle from './burger-ingredients.module.css';
-import {forwardRef, useEffect, useRef, useState} from "react";
+import React, {forwardRef, useEffect, useRef, useState} from "react";
 import {Counter, CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import PropTypes from "prop-types";
 import {useDispatch, useSelector} from "react-redux";
 import {decrementCount, fetchIngredients} from "../../services/reducers/ingredients";
 import Preloader from "../preloader/preloader";
 import {ingredientsMapping} from "../../utils/constants";
-import {showIngredientInfo} from "../../services/reducers/ingredient-info";
+import {hideIngredientInfo, showIngredientInfo} from "../../services/reducers/ingredient-info";
 import NoContent from "../no-content/no-content";
 import {removeIngredient} from "../../services/reducers/burger-constructor";
 import {useDrag, useDrop} from "react-dnd";
 import {setHighlightedCategory} from "../../services/reducers/nav";
+import IngredientDetails from "../ingredient-details/ingredient-details";
+import Modal from "../modal/modal";
 
 const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
 
@@ -117,6 +119,7 @@ const BurgerIngredients = () => {
 
   const dispatch = useDispatch();
   const {status} = useSelector((state) => state.ingredients);
+  const { itemDetails } = useSelector((state) => state.ingredientInfo);
   const {highlightedCategory} = useSelector((state) => state.nav);
   const ingredientContainerRef = useRef(null);
   const bunRef = useRef(null);
@@ -139,6 +142,10 @@ const BurgerIngredients = () => {
       isHover: monitor.isOver(),
     })
   });
+
+  const closeModal = () => {
+    dispatch(hideIngredientInfo());
+  }
 
 
   const handlePickCategory = (category) => {
@@ -188,24 +195,29 @@ const BurgerIngredients = () => {
   const outline = currentType !== 'new' && isHover ? '2px solid purple' : '';
 
   return (
-    <section className={`${ingredientsStyle.container}`}>
-      <h1 className={"text text_type_main-large mt-10 mb-5"}>Соберите бургер</h1>
-      <IngredientsNavigation currentCategory={highlightedCategory} onPickCategory={handlePickCategory}
-      refs={{bun: bunRef, sauce: sauceRef, main: mainRef}}/>
-      <div ref={ingredientContainerRef} className={`${ingredientsStyle.ingredients__container} custom-scroll`} style={{outline}}>
-        {status === 'loading'
-          ? <Preloader />
-          : (status === 'failed')
-            ? <NoContent />
-            :
-            <div ref={dropTarget}>
-              <Ingredients ref={bunRef} type={"bun"}/>
-              <Ingredients ref={sauceRef} type={"sauce"}/>
-              <Ingredients ref={mainRef} type={"main"}/>
-            </div>
-        }
-      </div>
-    </section>
+    <>
+      <section className={`${ingredientsStyle.container}`}>
+        <h1 className={"text text_type_main-large mt-10 mb-5"}>Соберите бургер</h1>
+        <IngredientsNavigation currentCategory={highlightedCategory} onPickCategory={handlePickCategory}
+        refs={{bun: bunRef, sauce: sauceRef, main: mainRef}}/>
+        <div ref={ingredientContainerRef} className={`${ingredientsStyle.ingredients__container} custom-scroll`} style={{outline}}>
+          {status === 'loading'
+            ? <Preloader />
+            : (status === 'failed')
+              ? <NoContent />
+              :
+              <div ref={dropTarget}>
+                <Ingredients ref={bunRef} type={"bun"}/>
+                <Ingredients ref={sauceRef} type={"sauce"}/>
+                <Ingredients ref={mainRef} type={"main"}/>
+              </div>
+          }
+        </div>
+      </section>
+      {itemDetails && <Modal title="Детали ингредиента" onClose={closeModal}>
+        <IngredientDetails ingredient={itemDetails}/>
+      </Modal>}
+    </>
   )
 }
 

@@ -3,18 +3,15 @@ import {createSlice} from "@reduxjs/toolkit";
 const ingredientInfoSlice = createSlice({
   name: 'ingredientInfo',
   initialState: {
-    itemDetails: {},
-    showDetails: false,
+    itemDetails: null,
   },
   reducers: {
     showIngredientInfo: (state, action) => {
       const {item} = action.payload;
       state.itemDetails = item;
-      state.showDetails = true;
     },
     hideIngredientInfo: (state) => {
-      state.itemDetails = {};
-      state.showDetails = false;
+      state.itemDetails = null;
     }
   },
 });

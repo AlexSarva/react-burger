@@ -10,9 +10,13 @@ import {
   setDropIndex,
 } from "../../services/reducers/burger-constructor";
 import {decrementCount, incrementCount} from "../../services/reducers/ingredients";
-import {fetchOrder} from "../../services/reducers/orders";
+import {clearOrder, fetchOrder, hideOrder} from "../../services/reducers/orders";
 import {useDrag, useDrop} from "react-dnd";
-import {useRef, useState} from "react";
+import React, {useRef, useState} from "react";
+import Modal from "../modal/modal";
+import Preloader from "../preloader/preloader";
+import NoContent from "../no-content/no-content";
+import OrderDetails from "../order-details/order-details";
 
 const ResultInfo = () => {
 
@@ -225,16 +229,34 @@ const EmptyConstructor = () => {
 }
 
 const BurgerConstructor = () => {
-
+  const { status, showOrder } = useSelector((state) => state.orders);
   const { bun, options } = useSelector((state) => state.burgerConstructor);
+  const dispatch = useDispatch();
+
+  const closeModal = () => {
+    dispatch(hideOrder());
+    dispatch(clearOrder());
+  };
 
   return (
-    <section className={constructorStyle.container}>
-      <div className={constructorStyle.constructor}>
-        {!bun && options.length === 0 ? <EmptyConstructor /> : <BurgerComponents />}
-      </div>
-      <ResultInfo />
-    </section>
+    <>
+      <section className={constructorStyle.container}>
+        <div className={constructorStyle.constructor}>
+          {!bun && options.length === 0 ? <EmptyConstructor /> : <BurgerComponents />}
+        </div>
+        <ResultInfo />
+      </section>
+      {showOrder && (
+        <Modal title="" onClose={closeModal}>
+          {(status === 'loading')
+            ? <Preloader />
+            : (status === 'failed')
+              ? <NoContent />
+              : <OrderDetails />
+          }
+        </Modal>
+      )}
+    </>
   )
 }
 
