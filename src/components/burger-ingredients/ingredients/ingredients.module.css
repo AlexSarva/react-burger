@@ -1,0 +1,17 @@
+.container {
+    width: 100%;
+}
+
+.elements {
+    width: 100%;
+    display: grid;
+    margin: 0;
+    padding: 0;
+    grid-template-columns: repeat(auto-fit, 272px);
+    grid-auto-flow: row dense;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    column-gap: 24px;
+    row-gap: 32px;
+}
