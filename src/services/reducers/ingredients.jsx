@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import { ingredientsApi } from "../../utils/ingredients-api";
+import { ingredientsTypes } from "../../utils/constants";
 
 const { getIngredients } = ingredientsApi();
 
@@ -25,7 +26,7 @@ const ingredientsSlice = createSlice({
   reducers: {
     incrementCount: (state, action) => {
       const { _id, type } = action.payload;
-      if (type === 'bun') {
+      if (type === ingredientsTypes.bun) {
         state.items.bun.forEach((item) => {
           item.count = 0;
         });
@@ -62,9 +63,9 @@ const ingredientsSlice = createSlice({
       })
       .addCase(fetchIngredients.fulfilled, (state, action) => {
         if (action.payload.success === true ) {
-          state.items.bun = action.payload.data.filter(item => item.type === 'bun')
-          state.items.main = action.payload.data.filter(item => item.type === 'main')
-          state.items.sauce = action.payload.data.filter(item => item.type === 'sauce')
+          state.items.bun = action.payload.data.filter(item => item.type === ingredientsTypes.bun)
+          state.items.main = action.payload.data.filter(item => item.type === ingredientsTypes.main)
+          state.items.sauce = action.payload.data.filter(item => item.type === ingredientsTypes.sauce)
           state.status = 'succeeded'
         } else {
           state.status = 'failed'

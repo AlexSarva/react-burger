@@ -47,10 +47,10 @@ const Ingredient = ({ingredient}) => {
       {isCounterActive && (count && count > 0) ? <Counter count={count} size="default" extraClass={style.counter} /> : null}
     </li>
   )
-}
-
-export default Ingredient;
+};
 
 Ingredient.propTypes = {
-  ingredient: IngredientFullType,
-}
+  ingredient: IngredientFullType.isRequired,
+};
+
+export default Ingredient;

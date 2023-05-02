@@ -6,6 +6,7 @@ import {incrementCount} from "../../../services/reducers/ingredients";
 import style from "./burger-components.module.css";
 import {ConstructorElement} from "@ya.praktikum/react-developer-burger-ui-components";
 import DragConstructorElement from "../drag-constructor-element/drag-constructor-element";
+import {ingredientsTypes} from "../../../utils/constants";
 
 const BurgerComponents = () => {
   const [usedType, setUsedType] = useState(null);
@@ -14,7 +15,7 @@ const BurgerComponents = () => {
   const [{isHover}, dropTarget] = useDrop({
     accept: "pickedIngredient",
     drop({ingredient}) {
-      if (ingredient.type === 'bun') {
+      if (ingredient.type === ingredientsTypes.bun) {
         dispatch(addIngredient({item: ingredient}));
         dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
       }
@@ -28,7 +29,7 @@ const BurgerComponents = () => {
     },
     collect(monitor) {
       return ({
-        isHover: (usedType === 'bun' || options.length === 0) && monitor.isOver(),
+        isHover: (usedType === ingredientsTypes.bun || options.length === 0) && monitor.isOver(),
       })
     }
   });

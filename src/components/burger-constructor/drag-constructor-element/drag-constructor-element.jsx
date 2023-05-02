@@ -7,6 +7,7 @@ import style from "./drag-constructor-element.module.css";
 import {ConstructorElement, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import {ConstructorElementType} from "../../../utils/types";
 import PropTypes from "prop-types";
+import {ingredientsTypes} from "../../../utils/constants";
 
 const DragConstructorElement = ({index, ingredient}) => {
   const ref = useRef(null);
@@ -34,7 +35,7 @@ const DragConstructorElement = ({index, ingredient}) => {
     },
     hover(item, monitor) {
       setPickedType(item.ingredient.type);
-      if (item.ingredient.type === 'bun') {
+      if (item.ingredient.type === ingredientsTypes.bun) {
         return
       }
       if (!ref.current) {
@@ -86,9 +87,9 @@ const DragConstructorElement = ({index, ingredient}) => {
 
   const opacity = isDragging ? 0 : 1
   const display = isDragging ? 'none' : ''
-  const padding = pickedType !== 'bun' && isOver ? (position === 'top') ? '7px 0 0 0' : '0 0 7px 0' : ''
-  const borderTop = pickedType !== 'bun' && isOver ? (position === 'top') ? '3px solid #4C4CFF' : '' : ''
-  const borderBottom = pickedType !== 'bun' && isOver ? (position === 'bottom') ? '3px solid #4C4CFF' : '' : ''
+  const padding = pickedType !== ingredientsTypes.bun && isOver ? (position === 'top') ? '7px 0 0 0' : '0 0 7px 0' : ''
+  const borderTop = pickedType !== ingredientsTypes.bun && isOver ? (position === 'top') ? '3px solid #4C4CFF' : '' : ''
+  const borderBottom = pickedType !== ingredientsTypes.bun && isOver ? (position === 'bottom') ? '3px solid #4C4CFF' : '' : ''
   dragPicked(dropPicked(ref))
 
   return (
@@ -107,7 +108,7 @@ const DragConstructorElement = ({index, ingredient}) => {
 };
 
 DragConstructorElement.propTypes = {
-  ingredient: ConstructorElementType,
+  ingredient: ConstructorElementType.isRequired,
   index: PropTypes.number.isRequired
 };
 
