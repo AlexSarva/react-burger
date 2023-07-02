@@ -1,14 +1,18 @@
 import style from './profile.module.css';
 import {NavLink} from "react-router-dom";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {EmailInput, Input, PasswordInput} from "@ya.praktikum/react-developer-burger-ui-components";
+import {useDispatch, useSelector} from "react-redux";
+import {fetchUserInfo, selectUser} from "../../../services/reducers/auth";
 
 const Profile = () => {
+  const userInfo = useSelector(selectUser)
   const [state, setState] = useState({
     name: 'asdasd',
     email: 'asdsa@asdasd.ru',
     password: '123123'
   });
+  const dispatch = useDispatch()
   const [nameIsDisabled, setNameIsDisabled] = useState(true)
   const inputRef = useRef(null)
   const onIconClick = () => {
@@ -28,6 +32,19 @@ const Profile = () => {
     console.log(state)
   }
 
+  useEffect(() => {
+    setState((s) => {
+      return {
+        ...s,
+        name: userInfo.name,
+        email: userInfo.email
+      }
+    })
+  }, [userInfo])
+
+  useEffect(() => {
+    dispatch(fetchUserInfo())
+  }, [dispatch])
 
   return (
     <section className={style.container}>
