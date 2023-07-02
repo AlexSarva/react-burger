@@ -9,7 +9,7 @@ const checkResponse = (res) => {
     return res.json();
   }
   return Promise.reject({
-    status: res.status,
+    statusCode: res.status,
     statusText: res.statusText,
   });
 };

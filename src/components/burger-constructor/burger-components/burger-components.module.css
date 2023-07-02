@@ -1,0 +1,44 @@
+.container {
+    width: 100%;
+    max-height: calc(100vh - 350px);
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.inside {
+    width: 100%;
+    max-height: calc(100%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.element {
+    width: 100%;
+    height: 80px;
+    display: block;
+    cursor: move;
+    transition: padding 0.3s ease-in-out;
+}
+
+.element_type_bun {
+    width: 536px;
+    height: 80px;
+    margin-left: 30px;
+    flex-grow: 0;
+}
+
+.element_position_bottom {
+    margin-top: auto;
+}
+
+.button {
+    height: 100%;
+}
