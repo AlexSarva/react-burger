@@ -1,6 +1,6 @@
 import {getCookie} from "./cookie";
 
-const AUTH_SERVICE = 'https://norma.nomoreparties.space/api/auth'
+const AUTH_SERVICE = 'https://norma.nomoreparties.space/api'
 
 const headers = {
   Accept: 'application/json',
@@ -32,7 +32,7 @@ const authApi = () => {
   const register = (payload) => {
     const {email, password, name} = payload
     console.log({name, email, password})
-    return request('/register', {
+    return request('/auth/register', {
       headers,
       method: 'POST',
       mode: 'cors',
@@ -49,7 +49,7 @@ const authApi = () => {
 
   const login = (payload) => {
     const {email, password} = payload
-    return request('/login', {
+    return request('/auth/login', {
       headers,
       method: 'POST',
       mode: 'cors',
@@ -64,7 +64,7 @@ const authApi = () => {
   }
 
   const userInfo = ({accessToken}) => {
-    return request('/user', {
+    return request('/auth/user', {
       headers: {
         ...headers,
         Authorization: `Bearer ${accessToken}`
@@ -78,9 +78,13 @@ const authApi = () => {
   }
 
   const refreshToken = () => {
-    return request('/token', {
+    return request('/auth/token', {
       headers,
       method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
       body: JSON.stringify({
         token: getCookie('refreshToken')
       })
@@ -88,17 +92,52 @@ const authApi = () => {
   }
 
   const logout = () => {
-    return request('/logout', {
+    return request('/auth/logout', {
       headers,
       method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
       body: JSON.stringify({
         token: getCookie('refreshToken')
       })
     })
   }
 
+  const resetPassword = (payload) => {
+    const {email} = payload
+    return request('/password-reset', {
+      headers,
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: JSON.stringify({
+        email
+      })
+    })
+  }
+
+  const changePassword = (payload) => {
+    const {password, token} = payload
+    return request('/password-reset/reset', {
+      headers,
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: JSON.stringify({
+        password,
+        token
+      })
+    })
+  }
+
   return {
-    register, login, userInfo, refreshToken, logout
+    register, login, userInfo, refreshToken, logout, resetPassword, changePassword
   }
 }
 

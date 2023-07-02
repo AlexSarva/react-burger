@@ -9,6 +9,9 @@ import logger from 'redux-logger'
 import rootReducer from "./services/reducers";
 import {Provider} from "react-redux";
 import {BrowserRouter} from "react-router-dom";
+import {QueryClient, QueryClientProvider} from "react-query";
+
+const queryClient = new QueryClient()
 
 const store = configureStore({
   reducer: rootReducer,
@@ -22,11 +25,13 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <App/>
-      </BrowserRouter>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <BrowserRouter>
+          <App/>
+        </BrowserRouter>
+      </Provider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
 

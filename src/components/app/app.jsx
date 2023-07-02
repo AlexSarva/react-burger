@@ -8,16 +8,25 @@ import ForgotPassword from "../pages/forgot-password/forgot-password";
 import Profile from "../pages/profile/profile";
 import NotFound from "../pages/not-found/not-found";
 import {RequireAuth} from "../../hoc/require-auth";
+import {RestrictAuth} from "../../hoc/restrict-auth";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout/>}>
         <Route index element={<Main/>}/>
-        <Route path='login' element={<Login/>}/>
-        <Route path='register' element={<Register/>}/>
-        <Route path='reset-password' element={<ResetPassword/>}/>
-        <Route path='forgot-password' element={<ForgotPassword/>}/>
+        <Route path='login' element={<RestrictAuth/>}>
+          <Route index element={<Login/>}/>
+        </Route>
+        <Route path='register' element={<RestrictAuth/>}>
+          <Route index element={<Register/>}/>
+        </Route>
+        <Route path='reset-password' element={<RestrictAuth/>}>
+          <Route index element={<ResetPassword/>}/>
+        </Route>
+        <Route path='forgot-password' element={<RestrictAuth/>}>
+          <Route index element={<ForgotPassword/>}/>
+        </Route>
         <Route path='profile' element={<RequireAuth/>}>
           <Route index element={<Profile/>}/>
         </Route>
