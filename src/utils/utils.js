@@ -15,5 +15,9 @@ export const checkTokenAndFetch = async (dispatch, cb) => {
       return
     }
   }
-  dispatch(cb())
+  try {
+    await dispatch(cb())
+  } catch (error) {
+    console.log('Token refresh failed:', error)
+  }
 }

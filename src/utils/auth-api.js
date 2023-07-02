@@ -87,8 +87,18 @@ const authApi = () => {
     })
   }
 
+  const logout = () => {
+    return request('/logout', {
+      headers,
+      method: 'POST',
+      body: JSON.stringify({
+        token: getCookie('refreshToken')
+      })
+    })
+  }
+
   return {
-    register, login, userInfo, refreshToken
+    register, login, userInfo, refreshToken, logout
   }
 }
 

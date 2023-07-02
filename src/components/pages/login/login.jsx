@@ -49,7 +49,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isLogged) {
-      navigate('/') // TODO: поменять на страницу, с которой пришел
+      navigate('/')
     }
   }, [isLogged, navigate])
 

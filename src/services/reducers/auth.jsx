@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import authApi from '../../utils/auth-api'
 import {deleteCookie, getCookie, isTokenExpired, setCookie} from '../../utils/cookie'
 
-const {login, register, userInfo, refreshToken} = authApi()
+const {login, register, userInfo, refreshToken, logout} = authApi()
 
 export const fetchRefreshToken = createAsyncThunk('auth/refreshToken/fetch', async (_, thunkAPI) => {
   const token = getCookie('accessToken')
@@ -18,6 +18,14 @@ export const fetchRefreshToken = createAsyncThunk('auth/refreshToken/fetch', asy
 export const fetchLogin = createAsyncThunk('auth/login/fetch', async (newUser, thunkAPI) => {
   try {
     return await login(newUser)
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
+export const fetchLogout = createAsyncThunk('auth/logout/fetch', async (_, thunkAPI) => {
+  try {
+    return await logout()
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
@@ -50,31 +58,20 @@ const authSlice = createSlice({
     statuses: {
       loginStatus: 'idle',
       registerStatus: 'idle',
-      userInfoStatus: 'idle'
+      userInfoStatus: 'idle',
+      refreshTokenStatus: 'idle',
+      logoutStatus: 'idle'
     },
     errors: {
       isError: false,
       loginError: null,
       registerError: null,
-      userInfoError: null
+      userInfoError: null,
+      refreshTokenError: null,
+      logoutError: null
     }
   },
   reducers: {
-    logout: (state) => {
-      state.isLogged = false
-      state.user = null
-      state.token = null
-      deleteCookie('accessToken')
-      deleteCookie('refreshToken')
-    },
-    resetErrors: (state) => {
-      state.errors = {
-        isError: false,
-        loginError: null,
-        registerError: null,
-        userInfoError: null
-      }
-    },
     resetError: (state, action) => {
       const {error} = action.payload
       state.errors = {
@@ -198,6 +195,29 @@ const authSlice = createSlice({
           }
         }
       })
+      .addCase(fetchLogout.pending, (state) => {
+        state.statuses = {...state.statuses, logoutStatus: 'loading'}
+      })
+      .addCase(fetchLogout.fulfilled, (state) => {
+        state.statuses = {...state.statuses, logoutStatus: 'succeeded'}
+        state.isLogged = false
+        state.user = null
+        state.token = null
+        deleteCookie('accessToken')
+        deleteCookie('refreshToken')
+      })
+      .addCase(fetchLogout.rejected, (state, action) => {
+        state.statuses = {...state.statuses, logoutStatus: 'failed'}
+        state.errors = {
+          ...state.errors,
+          isError: true,
+          logoutError: {
+            code: action.payload.status,
+            message: action.payload.statusText,
+            reason: action.payload.body.message
+          }
+        }
+      })
   }
 })
 
@@ -209,4 +229,4 @@ export const selectToken = (state) => state.auth.token
 export const selectStatuses = (state) => state.auth.statuses
 export const selectErrors = (state) => state.auth.errors
 
-export const {logout, resetErrors, resetError, resetStatus} = authSlice.actions
+export const {resetError, resetStatus} = authSlice.actions
