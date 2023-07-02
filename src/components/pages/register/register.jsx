@@ -1,10 +1,11 @@
-import style from './login.module.css';
-import {Button, EmailInput, PasswordInput} from "@ya.praktikum/react-developer-burger-ui-components";
+import style from './register.module.css';
 import {useState} from "react";
+import {Button, EmailInput, Input, PasswordInput} from "@ya.praktikum/react-developer-burger-ui-components";
 import {Link} from "react-router-dom";
 
-const Login = () => {
+const Register = () => {
   const [state, setState] = useState({
+    name: '',
     email: '',
     password: ''
   });
@@ -25,7 +26,14 @@ const Login = () => {
     <form
       onSubmit={handleSubmit}
       className={style.container}>
-      <h2 className={`text text_type_main-medium`}>Вход</h2>
+      <h2 className={`text text_type_main-medium`}>Регистрация</h2>
+      <Input name={'name'}
+             value={state.name}
+             placeholder="Имя"
+             extraClass={'mt-6'}
+             onChange={(e) => {
+               handleChangeState(e.target.name, e.target.value)
+             }}/>
       <EmailInput value={state.email}
                   name={'email'}
                   placeholder="E-mail"
@@ -43,22 +51,16 @@ const Login = () => {
                      }}
       />
       <Button htmlType="submit" type="primary" size="medium" extraClass="mt-6">
-        Войти
+        Зарегистрироваться
       </Button>
       <p className="text text_type_main-default text_color_inactive mt-20">
-        Вы — новый пользователь?
+        Уже зарегистрированы?
         <Link
-          to={'/register'}
-          className={`text text_type_main-default ${style.link} pl-2`}>Зарегистрироваться</Link>
-      </p>
-      <p className="text text_type_main-default text_color_inactive mt-4">
-        Забыли пароль?
-        <Link
-          to={'/forgot-password'}
-          className={`text text_type_main-default ${style.link} pl-2`}>Восстановить пароль</Link>
+          to={'/login'}
+          className={`text text_type_main-default ${style.link} pl-2`}>Войти</Link>
       </p>
     </form>
   )
 }
 
-export default Login;
+export default Register;
