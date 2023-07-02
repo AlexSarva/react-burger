@@ -5,6 +5,7 @@ import Login from "../pages/login/login";
 import Register from "../pages/register/register";
 import ResetPassword from "../pages/reset-password/reset-password";
 import ForgotPassword from "../pages/forgot-password/forgot-password";
+import Profile from "../pages/profile/profile";
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
         <Route path='register' element={<Register/>}/>
         <Route path='reset-password' element={<ResetPassword/>}/>
         <Route path='forgot-password' element={<ForgotPassword/>}/>
+        <Route path='profile' element={<Profile/>}/>
       </Route>
     </Routes>
   );
