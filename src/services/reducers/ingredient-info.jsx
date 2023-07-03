@@ -1,20 +1,20 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit'
 
 const ingredientInfoSlice = createSlice({
   name: 'ingredientInfo',
   initialState: {
-    itemDetails: null,
+    itemDetails: null
   },
   reducers: {
     showIngredientInfo: (state, action) => {
-      const {item} = action.payload;
-      state.itemDetails = item;
+      const { item } = action.payload
+      state.itemDetails = item
     },
     hideIngredientInfo: (state) => {
-      state.itemDetails = null;
+      state.itemDetails = null
     }
-  },
-});
+  }
+})
 
-export const { showIngredientInfo, hideIngredientInfo } = ingredientInfoSlice.actions;
-export default ingredientInfoSlice.reducer;
+export const { showIngredientInfo, hideIngredientInfo } = ingredientInfoSlice.actions
+export default ingredientInfoSlice.reducer

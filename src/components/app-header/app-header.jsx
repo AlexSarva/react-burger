@@ -1,7 +1,6 @@
-import style from './app-header.module.css';
-import {BurgerIcon, ListIcon, Logo, ProfileIcon} from "@ya.praktikum/react-developer-burger-ui-components";
-import NavigationLink from "../navigation-link/navigation-link";
-
+import style from './app-header.module.css'
+import { BurgerIcon, ListIcon, Logo, ProfileIcon } from '@ya.praktikum/react-developer-burger-ui-components'
+import NavigationLink from '../navigation-link/navigation-link'
 
 const AppHeader = () => {
   return (
@@ -9,19 +8,19 @@ const AppHeader = () => {
       <nav className={style.content}>
         <div className={style.navigation}>
           <NavigationLink path={'/'} label={'Конструктор'}>
-            <BurgerIcon type={"primary"}/>
+            <BurgerIcon type={'primary'}/>
           </NavigationLink>
           <NavigationLink path={'/orders'} label={'Лента заказов'}>
-            <ListIcon type={"secondary"}/>
+            <ListIcon type={'secondary'}/>
           </NavigationLink>
         </div>
         <Logo/>
         <NavigationLink path={'/profile'} label={'Личный кабинет'}>
-          <ProfileIcon type={"secondary"}/>
+          <ProfileIcon type={'secondary'}/>
         </NavigationLink>
       </nav>
     </header>
   )
 }
 
-export default AppHeader;
+export default AppHeader

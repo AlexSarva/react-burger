@@ -29,7 +29,7 @@ export const setCookie = (name, value, props) => {
 }
 
 export const deleteCookie = (name) => {
-  setCookie(name, null, {expires: -1})
+  setCookie(name, null, { expires: -1 })
 }
 
 export const isTokenExpired = (token) => {
@@ -38,7 +38,7 @@ export const isTokenExpired = (token) => {
   const jsonPayload = JSON.parse(window.atob(base64))
   const currentTime = Math.floor(Date.now() / 1000)
 
-  return jsonPayload.exp < currentTime  // + 1740
+  return jsonPayload.exp < currentTime // + 1740
 }
 
 export const tokenExpiredTime = (token) => {

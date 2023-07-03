@@ -1,8 +1,8 @@
-import style from './login.module.css';
-import {Button, EmailInput, PasswordInput} from "@ya.praktikum/react-developer-burger-ui-components";
-import {useEffect, useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
+import style from './login.module.css'
+import { Button, EmailInput, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchLogin,
   resetError,
@@ -10,20 +10,20 @@ import {
   selectErrors,
   selectIsLogged,
   selectStatuses
-} from "../../../services/reducers/auth";
-import ApiError from "../../api-error/api-error";
-import Preloader from "../../preloader/preloader";
+} from '../../../services/reducers/auth'
+import ApiError from '../../api-error/api-error'
+import Preloader from '../../preloader/preloader'
 
 const Login = () => {
-  const {loginStatus} = useSelector(selectStatuses)
-  const {loginError, isError} = useSelector(selectErrors)
+  const { loginStatus } = useSelector(selectStatuses)
+  const { loginError, isError } = useSelector(selectErrors)
   const isLogged = useSelector(selectIsLogged)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [state, setState] = useState({
     email: '',
     password: ''
-  });
+  })
 
   const handleChangeState = (name, value) => {
     setState({
@@ -34,7 +34,6 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(state)
     dispatch(fetchLogin(state))
   }
 
@@ -43,8 +42,8 @@ const Login = () => {
       email: '',
       password: ''
     })
-    dispatch(resetError({error: 'loginError'}))
-    dispatch(resetStatus({status: 'loginStatus'}))
+    dispatch(resetError({ error: 'loginError' }))
+    dispatch(resetStatus({ status: 'loginStatus' }))
   }
 
   useEffect(() => {
@@ -54,7 +53,7 @@ const Login = () => {
   }, [isLogged, navigate])
 
   useEffect(() => {
-    dispatch(resetError({error: 'loginError'}))
+    dispatch(resetError({ error: 'loginError' }))
   }, [dispatch])
 
   return (
@@ -65,7 +64,7 @@ const Login = () => {
       {loginStatus === 'idle' && <form
         onSubmit={handleSubmit}
         className={style.container}>
-        <h2 className={`text text_type_main-medium`}>Вход</h2>
+        <h2 className={'text text_type_main-medium'}>Вход</h2>
         <EmailInput value={state.email}
                     name={'email'}
                     placeholder="E-mail"
@@ -104,4 +103,4 @@ const Login = () => {
   )
 }
 
-export default Login;
+export default Login

@@ -1,4 +1,4 @@
-import {getCookie} from "./cookie";
+import { getCookie } from './cookie'
 
 const AUTH_SERVICE = 'https://norma.nomoreparties.space/api'
 
@@ -30,8 +30,7 @@ const authApi = () => {
     return fetch(url, options).then(checkResponse)
   }
   const register = (payload) => {
-    const {email, password, name} = payload
-    console.log({name, email, password})
+    const { email, password, name } = payload
     return request('/auth/register', {
       headers,
       method: 'POST',
@@ -42,13 +41,13 @@ const authApi = () => {
       body: JSON.stringify({
         name,
         email,
-        password,
+        password
       })
     })
   }
 
   const login = (payload) => {
-    const {email, password} = payload
+    const { email, password } = payload
     return request('/auth/login', {
       headers,
       method: 'POST',
@@ -63,7 +62,7 @@ const authApi = () => {
     })
   }
 
-  const userInfo = ({accessToken}) => {
+  const userInfo = ({ accessToken }) => {
     return request('/auth/user', {
       headers: {
         ...headers,
@@ -73,12 +72,12 @@ const authApi = () => {
       mode: 'cors',
       cache: 'no-cache',
       redirect: 'follow',
-      referrerPolicy: 'no-referrer',
+      referrerPolicy: 'no-referrer'
     })
   }
 
   const patchUser = (payload) => {
-    const {name, email, password} = payload
+    const { name, email, password } = payload
     const token = getCookie('accessToken')
     return request('/auth/user', {
       headers: {
@@ -125,7 +124,7 @@ const authApi = () => {
   }
 
   const resetPassword = (payload) => {
-    const {email} = payload
+    const { email } = payload
     return request('/password-reset', {
       headers,
       method: 'POST',
@@ -140,7 +139,7 @@ const authApi = () => {
   }
 
   const changePassword = (payload) => {
-    const {password, token} = payload
+    const { password, token } = payload
     return request('/password-reset/reset', {
       headers,
       method: 'POST',

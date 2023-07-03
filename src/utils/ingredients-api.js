@@ -1,21 +1,22 @@
-const baseUrl = 'https://norma.nomoreparties.space/api';
+const baseUrl = 'https://norma.nomoreparties.space/api'
 const headers = {
   Accept: 'application/json',
-  'Content-Type': 'application/json',
-};
+  'Content-Type': 'application/json'
+}
 
 const checkResponse = (res) => {
   if (res.ok) {
-    return res.json();
+    return res.json()
   }
+  // eslint-disable-next-line prefer-promise-reject-errors
   return Promise.reject({
     statusCode: res.status,
-    statusText: res.statusText,
-  });
-};
+    statusText: res.statusText
+  })
+}
 
 const request = (path, options) => {
-  const url = baseUrl + path;
+  const url = baseUrl + path
   // принимает два аргумента: урл и объект опций, как и `fetch`
   return fetch(url, options).then(checkResponse)
 }
@@ -24,9 +25,9 @@ export const ingredientsApi = () => {
   const getIngredients = () => {
     return request('/ingredients', {
       headers,
-      method: 'GET',
+      method: 'GET'
     })
-  };
+  }
 
   const getOrderNumber = (payload) => {
     return request('/orders', {
@@ -38,5 +39,5 @@ export const ingredientsApi = () => {
 
   return {
     getIngredients, getOrderNumber
-  };
-};
+  }
+}

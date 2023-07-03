@@ -1,27 +1,20 @@
-import style from './reset-password.module.css';
-import {useState} from "react";
-import {Button, Input, PasswordInput} from "@ya.praktikum/react-developer-burger-ui-components";
-import {Link, Navigate} from "react-router-dom";
-import authApi from "../../../utils/auth-api";
-import {useMutation} from "react-query";
-import Preloader from "../../preloader/preloader";
-import ApiError from "../../api-error/api-error";
+import style from './reset-password.module.css'
+import { useState } from 'react'
+import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
+import { Link, Navigate } from 'react-router-dom'
+import authApi from '../../../utils/auth-api'
+import { useMutation } from 'react-query'
+import Preloader from '../../preloader/preloader'
+import ApiError from '../../api-error/api-error'
 
 const ResetPassword = () => {
   const [state, setState] = useState({
     password: '',
     token: ''
-  });
-  const {changePassword} = authApi()
-
-  const mutation = useMutation(changePassword, {
-    onSuccess: (data) => {
-      console.log('onSuccess change', data)
-    },
-    onError: (data) => {
-      console.log('onError change', data)
-    }
   })
+  const { changePassword } = authApi()
+
+  const mutation = useMutation(changePassword)
 
   const handleChangeState = (name, value) => {
     setState({
@@ -32,7 +25,6 @@ const ResetPassword = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(state)
     mutation.mutate(state)
   }
 
@@ -48,7 +40,7 @@ const ResetPassword = () => {
             : <form
               onSubmit={handleSubmit}
               className={style.container}>
-              <h2 className={`text text_type_main-medium`}>Восстановление пароля</h2>
+              <h2 className={'text text_type_main-medium'}>Восстановление пароля</h2>
               <PasswordInput value={state.password}
                              name={'password'}
                              placeholder="Введите новый пароль"
@@ -80,4 +72,4 @@ const ResetPassword = () => {
   )
 }
 
-export default ResetPassword;
+export default ResetPassword

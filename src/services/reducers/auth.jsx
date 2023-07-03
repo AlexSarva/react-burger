@@ -1,8 +1,8 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import authApi from '../../utils/auth-api'
-import {deleteCookie, getCookie, isTokenExpired, setCookie} from '../../utils/cookie'
+import { deleteCookie, getCookie, isTokenExpired, setCookie } from '../../utils/cookie'
 
-const {login, register, userInfo, refreshToken, logout, patchUser} = authApi()
+const { login, register, userInfo, refreshToken, logout, patchUser } = authApi()
 
 export const fetchRefreshToken = createAsyncThunk('auth/refreshToken/fetch', async (_, thunkAPI) => {
   const token = getCookie('accessToken')
@@ -43,7 +43,7 @@ export const fetchRegister = createAsyncThunk('auth/register/fetch', async (newU
 export const fetchUserInfo = createAsyncThunk('auth/user-info/fetch', async (_, thunkAPI) => {
   const token = getCookie('accessToken')
   try {
-    return await userInfo({accessToken: token})
+    return await userInfo({ accessToken: token })
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
@@ -83,14 +83,14 @@ const authSlice = createSlice({
   },
   reducers: {
     resetError: (state, action) => {
-      const {error} = action.payload
+      const { error } = action.payload
       state.errors = {
         ...state.errors,
         [error]: null
       }
     },
     resetStatus: (state, action) => {
-      const {status} = action.payload
+      const { status } = action.payload
       state.statuses = {
         ...state.statuses,
         [status]: 'idle'
@@ -100,10 +100,10 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchLogin.pending, (state) => {
-        state.statuses = {...state.statuses, loginStatus: 'loading'}
+        state.statuses = { ...state.statuses, loginStatus: 'loading' }
       })
       .addCase(fetchLogin.fulfilled, (state, action) => {
-        state.statuses = {...state.statuses, loginStatus: 'succeeded'}
+        state.statuses = { ...state.statuses, loginStatus: 'succeeded' }
         state.user = action.payload.user
         const access = action.payload.accessToken
         let accessToken
@@ -117,7 +117,7 @@ const authSlice = createSlice({
         state.isLogged = true
       })
       .addCase(fetchLogin.rejected, (state, action) => {
-        state.statuses = {...state.statuses, loginStatus: 'failed'}
+        state.statuses = { ...state.statuses, loginStatus: 'failed' }
         state.errors = {
           ...state.errors,
           isError: true,
@@ -129,10 +129,10 @@ const authSlice = createSlice({
         }
       })
       .addCase(fetchRegister.pending, (state) => {
-        state.statuses = {...state.statuses, registerStatus: 'loading'}
+        state.statuses = { ...state.statuses, registerStatus: 'loading' }
       })
       .addCase(fetchRegister.fulfilled, (state, action) => {
-        state.statuses = {...state.statuses, registerStatus: 'succeeded'}
+        state.statuses = { ...state.statuses, registerStatus: 'succeeded' }
         state.user = action.payload.user
         const access = action.payload.accessToken
         let accessToken
@@ -146,7 +146,7 @@ const authSlice = createSlice({
         state.isLogged = true
       })
       .addCase(fetchRegister.rejected, (state, action) => {
-        state.statuses = {...state.statuses, registerStatus: 'failed'}
+        state.statuses = { ...state.statuses, registerStatus: 'failed' }
         state.errors = {
           ...state.errors,
           isError: true,
@@ -158,16 +158,16 @@ const authSlice = createSlice({
         }
       })
       .addCase(fetchUserInfo.pending, (state) => {
-        state.statuses = {...state.statuses, userInfoStatus: 'loading'}
+        state.statuses = { ...state.statuses, userInfoStatus: 'loading' }
       })
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
-        state.statuses = {...state.statuses, userInfoStatus: 'succeeded'}
+        state.statuses = { ...state.statuses, userInfoStatus: 'succeeded' }
         state.user = action.payload.user
         state.isLogged = true
         state.token = getCookie('accessToken')
       })
       .addCase(fetchUserInfo.rejected, (state, action) => {
-        state.statuses = {...state.statuses, userInfoStatus: 'failed'}
+        state.statuses = { ...state.statuses, userInfoStatus: 'failed' }
         state.errors = {
           ...state.errors,
           isError: true,
@@ -179,10 +179,10 @@ const authSlice = createSlice({
         }
       })
       .addCase(fetchRefreshToken.pending, (state) => {
-        state.statuses = {...state.statuses, refreshTokenStatus: 'loading'}
+        state.statuses = { ...state.statuses, refreshTokenStatus: 'loading' }
       })
       .addCase(fetchRefreshToken.fulfilled, (state, action) => {
-        state.statuses = {...state.statuses, refreshTokenStatus: 'succeeded'}
+        state.statuses = { ...state.statuses, refreshTokenStatus: 'succeeded' }
         const access = action.payload.accessToken
         let accessToken
         if (access.indexOf('Bearer ') === 0) {
@@ -194,7 +194,7 @@ const authSlice = createSlice({
         state.token = accessToken
       })
       .addCase(fetchRefreshToken.rejected, (state, action) => {
-        state.statuses = {...state.statuses, refreshTokenStatus: 'failed'}
+        state.statuses = { ...state.statuses, refreshTokenStatus: 'failed' }
         state.errors = {
           ...state.errors,
           isError: true,
@@ -206,10 +206,10 @@ const authSlice = createSlice({
         }
       })
       .addCase(fetchLogout.pending, (state) => {
-        state.statuses = {...state.statuses, logoutStatus: 'loading'}
+        state.statuses = { ...state.statuses, logoutStatus: 'loading' }
       })
       .addCase(fetchLogout.fulfilled, (state) => {
-        state.statuses = {...state.statuses, logoutStatus: 'succeeded'}
+        state.statuses = { ...state.statuses, logoutStatus: 'succeeded' }
         state.isLogged = false
         state.user = null
         state.token = null
@@ -217,7 +217,7 @@ const authSlice = createSlice({
         deleteCookie('refreshToken')
       })
       .addCase(fetchLogout.rejected, (state, action) => {
-        state.statuses = {...state.statuses, logoutStatus: 'failed'}
+        state.statuses = { ...state.statuses, logoutStatus: 'failed' }
         state.errors = {
           ...state.errors,
           isError: true,
@@ -229,14 +229,14 @@ const authSlice = createSlice({
         }
       })
       .addCase(fetchPatchUserInfo.pending, (state) => {
-        state.statuses = {...state.statuses, patchUserInfoStatus: 'loading'}
+        state.statuses = { ...state.statuses, patchUserInfoStatus: 'loading' }
       })
       .addCase(fetchPatchUserInfo.fulfilled, (state, action) => {
-        state.statuses = {...state.statuses, patchUserInfoStatus: 'succeeded'}
+        state.statuses = { ...state.statuses, patchUserInfoStatus: 'succeeded' }
         state.user = action.payload.user
       })
       .addCase(fetchPatchUserInfo.rejected, (state, action) => {
-        state.statuses = {...state.statuses, patchUserInfoStatus: 'failed'}
+        state.statuses = { ...state.statuses, patchUserInfoStatus: 'failed' }
         state.errors = {
           ...state.errors,
           isError: true,
@@ -258,4 +258,4 @@ export const selectToken = (state) => state.auth.token
 export const selectStatuses = (state) => state.auth.statuses
 export const selectErrors = (state) => state.auth.errors
 
-export const {resetError, resetStatus} = authSlice.actions
+export const { resetError, resetStatus } = authSlice.actions

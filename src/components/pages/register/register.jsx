@@ -1,8 +1,8 @@
-import style from './register.module.css';
-import {useEffect, useState} from "react";
-import {Button, EmailInput, Input, PasswordInput} from "@ya.praktikum/react-developer-burger-ui-components";
-import {Link, useNavigate} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
+import style from './register.module.css'
+import { useEffect, useState } from 'react'
+import { Button, EmailInput, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchRegister,
   resetError,
@@ -10,13 +10,13 @@ import {
   selectErrors,
   selectIsLogged,
   selectStatuses
-} from "../../../services/reducers/auth";
-import Preloader from "../../preloader/preloader";
-import ApiError from "../../api-error/api-error";
+} from '../../../services/reducers/auth'
+import Preloader from '../../preloader/preloader'
+import ApiError from '../../api-error/api-error'
 
 const Register = () => {
-  const {registerStatus} = useSelector(selectStatuses)
-  const {registerError, isError} = useSelector(selectErrors)
+  const { registerStatus } = useSelector(selectStatuses)
+  const { registerError, isError } = useSelector(selectErrors)
   const isLogged = useSelector(selectIsLogged)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -24,7 +24,7 @@ const Register = () => {
     name: '',
     email: '',
     password: ''
-  });
+  })
 
   const handleChangeState = (name, value) => {
     setState({
@@ -35,7 +35,6 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(state)
     dispatch(fetchRegister(state))
   }
 
@@ -45,8 +44,8 @@ const Register = () => {
       email: '',
       password: ''
     })
-    dispatch(resetError({error: 'registerError'}))
-    dispatch(resetStatus({status: 'registerStatus'}))
+    dispatch(resetError({ error: 'registerError' }))
+    dispatch(resetStatus({ status: 'registerStatus' }))
   }
 
   useEffect(() => {
@@ -56,7 +55,7 @@ const Register = () => {
   }, [isLogged, navigate])
 
   useEffect(() => {
-    dispatch(resetError({error: 'registerError'}))
+    dispatch(resetError({ error: 'registerError' }))
   }, [dispatch])
 
   return (
@@ -67,7 +66,7 @@ const Register = () => {
       {registerStatus === 'idle' && <form
         onSubmit={handleSubmit}
         className={style.container}>
-        <h2 className={`text text_type_main-medium`}>Регистрация</h2>
+        <h2 className={'text text_type_main-medium'}>Регистрация</h2>
         <Input name={'name'}
                value={state.name}
                placeholder="Имя"
@@ -106,4 +105,4 @@ const Register = () => {
   )
 }
 
-export default Register;
+export default Register

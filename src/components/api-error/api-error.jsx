@@ -1,8 +1,8 @@
-import styles from './api-error.module.css';
-import PropTypes from "prop-types";
-import {Button} from "@ya.praktikum/react-developer-burger-ui-components";
+import styles from './api-error.module.css'
+import PropTypes from 'prop-types'
+import { Button } from '@ya.praktikum/react-developer-burger-ui-components'
 
-const ApiError = ({message, onRetry}) => {
+const ApiError = ({ message, onRetry }) => {
   return (
     <div className={styles.container}>
       <div className={styles.animationContainer}>
@@ -25,5 +25,4 @@ ApiError.propTypes = {
   onRetry: PropTypes.func.isRequired
 }
 
-
-export default ApiError;
+export default ApiError

@@ -1,15 +1,15 @@
-import {ingredientsApi} from "../../utils/ingredients-api";
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import { ingredientsApi } from '../../utils/ingredients-api'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
-const { getOrderNumber } = ingredientsApi();
+const { getOrderNumber } = ingredientsApi()
 
 export const fetchOrder = createAsyncThunk('order/fetch', async (ingredients, thunkAPI) => {
   try {
-    return await getOrderNumber(ingredients);
+    return await getOrderNumber(ingredients)
   } catch (error) {
-    return thunkAPI.rejectWithValue(error);
+    return thunkAPI.rejectWithValue(error)
   }
-});
+})
 
 const orderSlice = createSlice({
   name: 'order',
@@ -20,18 +20,18 @@ const orderSlice = createSlice({
     },
     status: 'idle',
     error: null,
-    showOrder: false,
+    showOrder: false
   },
   reducers: {
     clearOrder: (state) => {
       state.order = {
         name: null,
         number: null
-      };
-      state.status = 'idle';
+      }
+      state.status = 'idle'
     },
     hideOrder: (state) => {
-      state.showOrder = false;
+      state.showOrder = false
     }
   },
   extraReducers: (builder) => {
@@ -39,24 +39,24 @@ const orderSlice = createSlice({
       .addCase(fetchOrder.pending, (state) => {
         state.status = 'loading'
         state.error = null
-        state.showOrder = true;
+        state.showOrder = true
       })
       .addCase(fetchOrder.fulfilled, (state, action) => {
-        if (action.payload.success === true ) {
-          state.order.name = action.payload.name;
-          state.order.number = action.payload.order.number;
-          state.status = 'succeeded';
+        if (action.payload.success === true) {
+          state.order.name = action.payload.name
+          state.order.number = action.payload.order.number
+          state.status = 'succeeded'
         } else {
-          state.status = 'failed';
-          state.error = `Error success: ${action.payload.success}`;
+          state.status = 'failed'
+          state.error = `Error success: ${action.payload.success}`
         }
       })
       .addCase(fetchOrder.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = `${action.error.message} > Error Code ${action.payload.statusCode}: ${action.payload.statusText}`;
+        state.status = 'failed'
+        state.error = `${action.error.message} > Error Code ${action.payload.statusCode}: ${action.payload.statusText}`
       })
   }
 })
 
-export const { clearOrder, hideOrder } = orderSlice.actions;
-export default orderSlice.reducer;
+export const { clearOrder, hideOrder } = orderSlice.actions
+export default orderSlice.reducer

@@ -1,25 +1,18 @@
-import style from './forgot-password.module.css';
-import {useState} from "react";
-import {Button, EmailInput} from "@ya.praktikum/react-developer-burger-ui-components";
-import {Link, Navigate} from "react-router-dom";
-import {useMutation} from "react-query";
+import style from './forgot-password.module.css'
+import { useState } from 'react'
+import { Button, EmailInput } from '@ya.praktikum/react-developer-burger-ui-components'
+import { Link, Navigate } from 'react-router-dom'
+import { useMutation } from 'react-query'
 import useAuth from '../../../utils/auth-api'
-import Preloader from "../../preloader/preloader";
-import ApiError from "../../api-error/api-error";
+import Preloader from '../../preloader/preloader'
+import ApiError from '../../api-error/api-error'
 
 const ForgotPassword = () => {
   const [state, setState] = useState({
-    email: '',
-  });
-  const {resetPassword} = useAuth()
-  const mutation = useMutation(resetPassword, {
-    onSuccess: (data) => {
-      console.log('onSuccess reset', data)
-    },
-    onError: (data) => {
-      console.log('onError reset', data)
-    }
+    email: ''
   })
+  const { resetPassword } = useAuth()
+  const mutation = useMutation(resetPassword)
 
   const handleChangeState = (name, value) => {
     setState({
@@ -30,7 +23,6 @@ const ForgotPassword = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(state)
     mutation.mutate(state)
   }
 
@@ -46,7 +38,7 @@ const ForgotPassword = () => {
             : <form
               onSubmit={handleSubmit}
               className={style.container}>
-              <h2 className={`text text_type_main-medium`}>Восстановление пароля</h2>
+              <h2 className={'text text_type_main-medium'}>Восстановление пароля</h2>
               <EmailInput value={state.email}
                           name={'email'}
                           placeholder="Укажите e-mail"
@@ -71,4 +63,4 @@ const ForgotPassword = () => {
   )
 }
 
-export default ForgotPassword;
+export default ForgotPassword

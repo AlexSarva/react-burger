@@ -1,23 +1,23 @@
-import {getCookie, isTokenExpired} from "./cookie";
-import {fetchRefreshToken} from "../services/reducers/auth";
+import { getCookie, isTokenExpired } from './cookie'
+import { fetchRefreshToken } from '../services/reducers/auth'
 
 export const generateOrder = () => {
-  return Math.floor(100000 + Math.random() * 900000);
+  return Math.floor(100000 + Math.random() * 900000)
 }
 
 export const checkTokenAndFetch = async (dispatch, cb, params) => {
-  const token = getCookie('accessToken');
+  const token = getCookie('accessToken')
   if (isTokenExpired(token)) {
     try {
-      await dispatch(fetchRefreshToken());
+      await dispatch(fetchRefreshToken())
     } catch (error) {
-      console.log('Token refresh failed:', error);
-      return;
+      console.log('Token refresh failed:', error)
+      return
     }
   }
   try {
-    await dispatch(cb(params)); // call the function with provided parameters
+    await dispatch(cb(params)) // call the function with provided parameters
   } catch (error) {
-    console.log('Token check failed:', error);
+    console.log('Token check failed:', error)
   }
 }

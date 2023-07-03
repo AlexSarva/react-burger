@@ -1,9 +1,8 @@
 import style from './not-found.module.css'
-import {Link, useNavigate} from 'react-router-dom'
-import {Button} from "@ya.praktikum/react-developer-burger-ui-components";
+import { Link, useNavigate } from 'react-router-dom'
+import { Button } from '@ya.praktikum/react-developer-burger-ui-components'
 
 const NotFound = () => {
-
   const navigate = useNavigate()
 
   return (
