@@ -77,6 +77,25 @@ const authApi = () => {
     })
   }
 
+  const patchUser = (payload) => {
+    const {name, email, password} = payload
+    const token = getCookie('accessToken')
+    return request('/auth/user', {
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${token}`
+      },
+      method: 'PATCH',
+      mode: 'cors',
+      cache: 'no-cache',
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: JSON.stringify({
+        name, email, password
+      })
+    })
+  }
+
   const refreshToken = () => {
     return request('/auth/token', {
       headers,
@@ -137,7 +156,7 @@ const authApi = () => {
   }
 
   return {
-    register, login, userInfo, refreshToken, logout, resetPassword, changePassword
+    register, login, userInfo, refreshToken, logout, resetPassword, changePassword, patchUser
   }
 }
 

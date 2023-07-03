@@ -5,19 +5,19 @@ export const generateOrder = () => {
   return Math.floor(100000 + Math.random() * 900000);
 }
 
-export const checkTokenAndFetch = async (dispatch, cb) => {
-  const token = getCookie('accessToken')
+export const checkTokenAndFetch = async (dispatch, cb, params) => {
+  const token = getCookie('accessToken');
   if (isTokenExpired(token)) {
     try {
-      await dispatch(fetchRefreshToken())
+      await dispatch(fetchRefreshToken());
     } catch (error) {
-      console.log('Token refresh failed:', error)
-      return
+      console.log('Token refresh failed:', error);
+      return;
     }
   }
   try {
-    await dispatch(cb())
+    await dispatch(cb(params)); // call the function with provided parameters
   } catch (error) {
-    console.log('Token refresh failed:', error)
+    console.log('Token check failed:', error);
   }
 }

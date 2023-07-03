@@ -5,6 +5,7 @@ import {EmailInput, Input, PasswordInput} from "@ya.praktikum/react-developer-bu
 import {useDispatch, useSelector} from "react-redux";
 import {
   fetchLogout,
+  fetchPatchUserInfo,
   resetError,
   resetStatus,
   selectErrors,
@@ -13,6 +14,7 @@ import {
 } from "../../../services/reducers/auth";
 import Preloader from "../../preloader/preloader";
 import ApiError from "../../api-error/api-error";
+import {checkTokenAndFetch} from "../../../utils/utils";
 
 const Profile = () => {
   const userInfo = useSelector(selectUser)
@@ -21,8 +23,10 @@ const Profile = () => {
   const [state, setState] = useState({
     name: '',
     email: '',
-    password: ''
   });
+  const [passwordState, setPasswordState] = useState({
+    password: 'best-password-ever',
+  })
   const dispatch = useDispatch()
   const [nameIsDisabled, setNameIsDisabled] = useState(true)
   const inputRef = useRef(null)
@@ -46,6 +50,21 @@ const Profile = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log(state)
+
+    checkTokenAndFetch(dispatch, fetchPatchUserInfo, state)
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  const handleSubmitPassword = (e) => {
+    e.preventDefault()
+    console.log(passwordState)
+
+    checkTokenAndFetch(dispatch, fetchPatchUserInfo, passwordState)
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   const handleLogout = () => {
@@ -59,7 +78,6 @@ const Profile = () => {
         ...s,
         name: userInfo.name,
         email: userInfo.email,
-        password: '123123'
       }
     })
   }, [userInfo])
@@ -91,35 +109,43 @@ const Profile = () => {
                   В этом разделе вы можете <br/> изменить свои персональные данные
                 </p>
               </ul>
-              <form onSubmit={handleSubmit} className={style.form}>
-                <Input name={'name'}
-                       type={'text'}
-                       value={state.name}
-                       icon={'EditIcon'}
-                       ref={inputRef}
-                       disabled={nameIsDisabled}
-                       onIconClick={onIconClick}
-                       placeholder="Имя"
-                       onChange={(e) => {
-                         handleChangeState(e.target.name, e.target.value)
-                       }}/>
-                <EmailInput value={state.email}
-                            name={'email'}
-                            placeholder="Логин"
-                            isIcon={true}
-                            onChange={(e) => {
-                              handleChangeState(e.target.name, e.target.value)
-                            }}/>
-                <PasswordInput value={state.password}
-                               name={'password'}
-                               icon="EditIcon"
-                               placeholder="Пароль"
-                               onChange={(e) => {
-                                 handleChangeState(e.target.name, e.target.value)
-                               }}
-                />
-                <button type="submit" style={{display: 'none'}}></button>
-              </form>
+              <div className={style.inputs}>
+                <form onSubmit={handleSubmit} className={style.form}>
+                  <Input name={'name'}
+                         type={'text'}
+                         value={state.name}
+                         icon={'EditIcon'}
+                         ref={inputRef}
+                         disabled={nameIsDisabled}
+                         onIconClick={onIconClick}
+                         placeholder="Имя"
+                         onChange={(e) => {
+                           handleChangeState(e.target.name, e.target.value)
+                         }}/>
+                  <EmailInput value={state.email}
+                              name={'email'}
+                              placeholder="Логин"
+                              isIcon={true}
+                              onChange={(e) => {
+                                handleChangeState(e.target.name, e.target.value)
+                              }}/>
+                  <button type="submit" style={{display: 'none'}}></button>
+                </form>
+                <form onSubmit={handleSubmitPassword}>
+                  <PasswordInput value={passwordState.password}
+                                 name={'password'}
+                                 icon="EditIcon"
+                                 placeholder="Пароль"
+                                 onChange={(e) => {
+                                   setPasswordState({
+                                     ...passwordState,
+                                     [e.target.name]: e.target.value
+                                   })
+                                 }}
+                  />
+                  <button type="submit" style={{display: 'none'}}></button>
+                </form>
+              </div>
             </section>
       }
     </>

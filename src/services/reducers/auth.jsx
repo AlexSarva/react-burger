@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import authApi from '../../utils/auth-api'
 import {deleteCookie, getCookie, isTokenExpired, setCookie} from '../../utils/cookie'
 
-const {login, register, userInfo, refreshToken, logout} = authApi()
+const {login, register, userInfo, refreshToken, logout, patchUser} = authApi()
 
 export const fetchRefreshToken = createAsyncThunk('auth/refreshToken/fetch', async (_, thunkAPI) => {
   const token = getCookie('accessToken')
@@ -49,6 +49,14 @@ export const fetchUserInfo = createAsyncThunk('auth/user-info/fetch', async (_, 
   }
 })
 
+export const fetchPatchUserInfo = createAsyncThunk('auth/patch-user-info/fetch', async (newUser, thunkAPI) => {
+  try {
+    return await patchUser(newUser)
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -59,6 +67,7 @@ const authSlice = createSlice({
       loginStatus: 'idle',
       registerStatus: 'idle',
       userInfoStatus: 'idle',
+      patchUserInfoStatus: 'idle',
       refreshTokenStatus: 'idle',
       logoutStatus: 'idle'
     },
@@ -67,6 +76,7 @@ const authSlice = createSlice({
       loginError: null,
       registerError: null,
       userInfoError: null,
+      patchUserInfoError: null,
       refreshTokenError: null,
       logoutError: null
     }
@@ -212,6 +222,25 @@ const authSlice = createSlice({
           ...state.errors,
           isError: true,
           logoutError: {
+            code: action.payload.status,
+            message: action.payload.statusText,
+            reason: action.payload.body.message
+          }
+        }
+      })
+      .addCase(fetchPatchUserInfo.pending, (state) => {
+        state.statuses = {...state.statuses, patchUserInfoStatus: 'loading'}
+      })
+      .addCase(fetchPatchUserInfo.fulfilled, (state, action) => {
+        state.statuses = {...state.statuses, patchUserInfoStatus: 'succeeded'}
+        state.user = action.payload.user
+      })
+      .addCase(fetchPatchUserInfo.rejected, (state, action) => {
+        state.statuses = {...state.statuses, patchUserInfoStatus: 'failed'}
+        state.errors = {
+          ...state.errors,
+          isError: true,
+          patchUserInfoError: {
             code: action.payload.status,
             message: action.payload.statusText,
             reason: action.payload.body.message
