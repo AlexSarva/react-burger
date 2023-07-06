@@ -1,4 +1,4 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
 export const IngredientFullType = PropTypes.shape({
   _id: PropTypes.string.isRequired,
@@ -6,14 +6,14 @@ export const IngredientFullType = PropTypes.shape({
   price: PropTypes.number.isRequired,
   image_mobile: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,
-  count: PropTypes.number,
+  count: PropTypes.number
 })
 
 export const ConstructorElementType = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   price: PropTypes.number.isRequired,
-  image_mobile: PropTypes.string.isRequired,
+  image_mobile: PropTypes.string.isRequired
 })
 
 export const IngredientType = PropTypes.shape({
@@ -30,4 +30,3 @@ export const IngredientDetailsType = PropTypes.shape({
   name: PropTypes.string.isRequired,
   value: PropTypes.number.isRequired
 })
-

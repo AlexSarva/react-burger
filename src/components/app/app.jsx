@@ -1,36 +1,51 @@
-import React, {useEffect} from 'react';
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import AppHeader from "../app-header/app-header";
-import BurgerIngredients from "../burger-ingredients/burger-ingredients";
-import BurgerConstructor from "../burger-constructor/burger-constructor";
-import {useDispatch, useSelector} from "react-redux";
-import {clearConstructor} from "../../services/reducers/burger-constructor";
-import {clearIngredients} from "../../services/reducers/ingredients";
+import Main from '../pages/main/main'
+import { Route, Routes } from 'react-router-dom'
+import Layout from '../layout/layout'
+import Login from '../pages/login/login'
+import Register from '../pages/register/register'
+import ResetPassword from '../pages/reset-password/reset-password'
+import ForgotPassword from '../pages/forgot-password/forgot-password'
+import Profile from '../pages/profile/profile'
+import NotFound from '../pages/not-found/not-found'
+import Ingredient from '../pages/ingredient/ingredient'
+import ProtectRoute from '../../hoc/protect-route'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { fetchIngredients } from '../../services/reducers/ingredients'
+import { fetchUserInfo } from '../../services/reducers/auth'
 
-function App() {
-  const dispatch = useDispatch();
-  const { status } = useSelector((state) => state.orders);
+function App () {
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    return () => {
-      if (status === 'succeeded') {
-        dispatch(clearConstructor());
-        dispatch(clearIngredients());
-      }
-    };
-  }, [dispatch, status]);
-
+    dispatch(fetchIngredients())
+    dispatch(fetchUserInfo())
+  }, [])
 
   return (
-    <>
-      <AppHeader />
-      <DndProvider backend={HTML5Backend}>
-        <BurgerIngredients />
-        <BurgerConstructor />
-      </DndProvider>
-    </>
-  );
+    <Routes>
+      <Route path="/" element={<Layout/>}>
+        <Route index element={<Main/>}/>
+        <Route path='login' element={<ProtectRoute onlyUnAuth={true}/>}>
+          <Route index element={<Login/>}/>
+        </Route>
+        <Route path='register' element={<ProtectRoute onlyUnAuth={true}/>}>
+          <Route index element={<Register/>}/>
+        </Route>
+        <Route path='reset-password' element={<ProtectRoute onlyUnAuth={true}/>}>
+          <Route index element={<ResetPassword/>}/>
+        </Route>
+        <Route path='forgot-password' element={<ProtectRoute onlyUnAuth={true}/>}>
+          <Route index element={<ForgotPassword/>}/>
+        </Route>
+        <Route path='/ingredients/:id' element={<Ingredient/>}/>
+        <Route path='profile' element={<ProtectRoute/>}>
+          <Route index element={<Profile/>}/>
+        </Route>
+      </Route>
+      <Route path="*" element={<NotFound/>}/>
+    </Routes>
+  )
 }
 
-export default App;
+export default App

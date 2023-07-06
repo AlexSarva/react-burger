@@ -1,4 +1,5 @@
-import styles from './preloader.module.css';
+import styles from './preloader.module.css'
+
 const Preloader = () => {
   return (
     <div className={styles.preloader}>
@@ -8,4 +9,4 @@ const Preloader = () => {
   )
 }
 
-export default Preloader;
+export default Preloader

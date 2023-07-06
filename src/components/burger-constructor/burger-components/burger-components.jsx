@@ -1,44 +1,44 @@
-import React, {useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {useDrop} from "react-dnd";
-import {addIngredient} from "../../../services/reducers/burger-constructor";
-import {incrementCount} from "../../../services/reducers/ingredients";
-import style from "./burger-components.module.css";
-import {ConstructorElement} from "@ya.praktikum/react-developer-burger-ui-components";
-import DragConstructorElement from "../drag-constructor-element/drag-constructor-element";
-import {ingredientsTypes} from "../../../utils/constants";
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useDrop } from 'react-dnd'
+import { addIngredient } from '../../../services/reducers/burger-constructor'
+import { incrementCount } from '../../../services/reducers/ingredients'
+import style from './burger-components.module.css'
+import { ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components'
+import DragConstructorElement from '../drag-constructor-element/drag-constructor-element'
+import { ingredientsTypes } from '../../../utils/constants'
 
 const BurgerComponents = () => {
-  const [usedType, setUsedType] = useState(null);
-  const {bun, options} = useSelector((state) => state.burgerConstructor);
-  const dispatch = useDispatch();
-  const [{isHover}, dropTarget] = useDrop({
-    accept: "pickedIngredient",
-    drop({ingredient}) {
+  const [usedType, setUsedType] = useState(null)
+  const { bun, options } = useSelector((state) => state.burgerConstructor)
+  const dispatch = useDispatch()
+  const [{ isHover }, dropTarget] = useDrop({
+    accept: 'pickedIngredient',
+    drop ({ ingredient }) {
       if (ingredient.type === ingredientsTypes.bun) {
-        dispatch(addIngredient({item: ingredient}));
-        dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
+        dispatch(addIngredient({ item: ingredient }))
+        dispatch(incrementCount({ _id: ingredient._id, type: ingredient.type }))
       }
       if (options.length === 0) {
-        dispatch(addIngredient({item: ingredient}));
-        dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
+        dispatch(addIngredient({ item: ingredient }))
+        dispatch(incrementCount({ _id: ingredient._id, type: ingredient.type }))
       }
     },
-    hover({ingredient}) {
-      setUsedType(ingredient.type);
+    hover ({ ingredient }) {
+      setUsedType(ingredient.type)
     },
-    collect(monitor) {
+    collect (monitor) {
       return ({
-        isHover: (usedType === ingredientsTypes.bun || options.length === 0) && monitor.isOver(),
+        isHover: (usedType === ingredientsTypes.bun || options.length === 0) && monitor.isOver()
       })
     }
-  });
+  })
 
   // const outline = isHover ? '2px solid #4C4CFF' : '';
-  const outline = isHover ? '2px solid #4C4CFF' : '';
+  const outline = isHover ? '2px solid #4C4CFF' : ''
 
   return (
-    <div ref={dropTarget} className={`${style.container}`} style={{outline}}>
+    <div ref={dropTarget} className={`${style.container}`} style={{ outline }}>
       {bun && <ConstructorElement
         type="top"
         isLocked={true}
@@ -65,7 +65,7 @@ const BurgerComponents = () => {
         extraClass={`${style.element} ${style.element_type_bun} ${style.element_position_bottom}`}
       />}
     </div>
-  );
-};
+  )
+}
 
-export default BurgerComponents;
+export default BurgerComponents

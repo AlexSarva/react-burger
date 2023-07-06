@@ -1,40 +1,40 @@
-import React, {useRef, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {useDrag, useDrop} from "react-dnd";
-import {addIngredient, onDrop, removeIngredient, setDropIndex} from "../../../services/reducers/burger-constructor";
-import {decrementCount, incrementCount} from "../../../services/reducers/ingredients";
-import style from "./drag-constructor-element.module.css";
-import {ConstructorElement, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
-import {ConstructorElementType} from "../../../utils/types";
-import PropTypes from "prop-types";
-import {ingredientsTypes} from "../../../utils/constants";
+import React, { useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useDrag, useDrop } from 'react-dnd'
+import { addIngredient, onDrop, removeIngredient, setDropIndex } from '../../../services/reducers/burger-constructor'
+import { decrementCount, incrementCount } from '../../../services/reducers/ingredients'
+import style from './drag-constructor-element.module.css'
+import { ConstructorElement, DragIcon } from '@ya.praktikum/react-developer-burger-ui-components'
+import { ConstructorElementType } from '../../../utils/types'
+import PropTypes from 'prop-types'
+import { ingredientsTypes } from '../../../utils/constants'
 
-const DragConstructorElement = ({index, ingredient}) => {
-  const ref = useRef(null);
-  const [pickedType, setPickedType] = useState(null);
-  const {_id, type, name, price, image_mobile} = ingredient;
-  const dispatch = useDispatch();
-  const {position} = useSelector((state) => state.burgerConstructor.dragDropIndexes);
-  const [{isDragging}, dragPicked] = useDrag({
-      type: 'pickedIngredient',
-      item: () => {
-        return {index, ingredientType: 'exist', ingredient}
-      },
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    }
-  );
+const DragConstructorElement = ({ index, ingredient }) => {
+  const ref = useRef(null)
+  const [pickedType, setPickedType] = useState(null)
+  const { _id, type, name, price, image_mobile } = ingredient
+  const dispatch = useDispatch()
+  const { position } = useSelector((state) => state.burgerConstructor.dragDropIndexes)
+  const [{ isDragging }, dragPicked] = useDrag({
+    type: 'pickedIngredient',
+    item: () => {
+      return { index, ingredientType: 'exist', ingredient }
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging()
+    })
+  }
+  )
 
-  const [{isOver}, dropPicked] = useDrop({
+  const [{ isOver }, dropPicked] = useDrop({
     accept: 'pickedIngredient',
-    collect(monitor) {
+    collect (monitor) {
       return {
-        isOver: monitor.isOver(),
+        isOver: monitor.isOver()
       }
     },
-    hover(item, monitor) {
-      setPickedType(item.ingredient.type);
+    hover (item, monitor) {
+      setPickedType(item.ingredient.type)
       if (item.ingredient.type === ingredientsTypes.bun) {
         return
       }
@@ -68,21 +68,20 @@ const DragConstructorElement = ({index, ingredient}) => {
         dropIndex: hoverClientY < hoverMiddleY ? dropIndex : (dropIndex + 1),
         position: hoverClientY < hoverMiddleY ? 'top' : 'bottom'
       }))
-
     },
-    drop({index, ingredientType, ingredient}) {
+    drop ({ index, ingredientType, ingredient }) {
       if (ingredientType === 'exist') {
-        dispatch(onDrop({dragIndex: index}))
+        dispatch(onDrop({ dragIndex: index }))
       } else {
-        dispatch(addIngredient({item: ingredient}));
-        dispatch(incrementCount({_id: ingredient._id, type: ingredient.type}));
+        dispatch(addIngredient({ item: ingredient }))
+        dispatch(incrementCount({ _id: ingredient._id, type: ingredient.type }))
       }
     }
   })
 
   const handleDelete = () => {
-    dispatch(removeIngredient({index, item: ingredient}));
-    dispatch(decrementCount({_id, type}));
+    dispatch(removeIngredient({ index, item: ingredient }))
+    dispatch(decrementCount({ _id, type }))
   }
 
   const opacity = isDragging ? 0 : 1
@@ -95,7 +94,7 @@ const DragConstructorElement = ({index, ingredient}) => {
   return (
     <div ref={ref}
          className={style.container}
-         style={{opacity, padding, display, borderTop, borderBottom}}>
+         style={{ opacity, padding, display, borderTop, borderBottom }}>
       <DragIcon type="primary"/>
       <ConstructorElement
         text={name}
@@ -105,11 +104,11 @@ const DragConstructorElement = ({index, ingredient}) => {
       />
     </div>
   )
-};
+}
 
 DragConstructorElement.propTypes = {
   ingredient: ConstructorElementType.isRequired,
   index: PropTypes.number.isRequired
-};
+}
 
-export default DragConstructorElement;
+export default DragConstructorElement

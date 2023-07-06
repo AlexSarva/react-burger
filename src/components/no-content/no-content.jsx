@@ -1,4 +1,4 @@
-import styles from './no-content.module.css';
+import styles from './no-content.module.css'
 
 const NoContent = () => {
   return (
@@ -18,4 +18,4 @@ const NoContent = () => {
   )
 }
 
-export default NoContent;
+export default NoContent
