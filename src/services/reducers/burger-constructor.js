@@ -16,7 +16,7 @@ const handleShow = (state) => {
 const fillIngredients = (state) => {
   const bun = state.bun ? [state.bun._id, state.bun._id] : []
   const options = state.options.map(option => option._id)
-  state.ingredients = [...bun, ...options]
+  state.ingredients = [bun[0], ...options, bun[1]]
 }
 
 const constructorSlice = createSlice({

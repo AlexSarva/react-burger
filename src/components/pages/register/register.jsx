@@ -1,25 +1,16 @@
 import style from './register.module.css'
 import { useEffect, useState } from 'react'
 import { Button, EmailInput, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchRegister,
-  resetError,
-  resetStatus,
-  selectErrors,
-  selectIsLogged,
-  selectStatuses
-} from '../../../services/reducers/auth'
+import { fetchRegister, resetError, resetStatus, selectErrors, selectStatuses } from '../../../services/reducers/auth'
 import Preloader from '../../preloader/preloader'
 import ApiError from '../../api-error/api-error'
 
 const Register = () => {
   const { registerStatus } = useSelector(selectStatuses)
   const { registerError, isError } = useSelector(selectErrors)
-  const isLogged = useSelector(selectIsLogged)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const [state, setState] = useState({
     name: '',
     email: '',
@@ -47,12 +38,6 @@ const Register = () => {
     dispatch(resetError({ error: 'registerError' }))
     dispatch(resetStatus({ status: 'registerStatus' }))
   }
-
-  useEffect(() => {
-    if (isLogged) {
-      navigate('/') // TODO: поменять на страницу, с которой пришел
-    }
-  }, [isLogged, navigate])
 
   useEffect(() => {
     dispatch(resetError({ error: 'registerError' }))

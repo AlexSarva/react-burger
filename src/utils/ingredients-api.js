@@ -1,37 +1,27 @@
-const baseUrl = 'https://norma.nomoreparties.space/api'
+import { getCookie } from './cookie'
+import { request, requestWithRefresh } from './api-utils'
+import { BURGER_SERVICE } from './constants'
+
 const headers = {
   Accept: 'application/json',
   'Content-Type': 'application/json'
 }
 
-const checkResponse = (res) => {
-  if (res.ok) {
-    return res.json()
-  }
-  // eslint-disable-next-line prefer-promise-reject-errors
-  return Promise.reject({
-    statusCode: res.status,
-    statusText: res.statusText
-  })
-}
-
-const request = (path, options) => {
-  const url = baseUrl + path
-  // принимает два аргумента: урл и объект опций, как и `fetch`
-  return fetch(url, options).then(checkResponse)
-}
-
 export const ingredientsApi = () => {
   const getIngredients = () => {
-    return request('/ingredients', {
+    return request(BURGER_SERVICE, '/ingredients', {
       headers,
       method: 'GET'
     })
   }
 
   const getOrderNumber = (payload) => {
-    return request('/orders', {
-      headers,
+    const token = getCookie('accessToken')
+    return requestWithRefresh(BURGER_SERVICE, '/orders', {
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${token}`
+      },
       method: 'POST',
       body: JSON.stringify(payload)
     })

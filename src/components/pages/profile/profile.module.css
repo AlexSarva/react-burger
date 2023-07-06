@@ -22,10 +22,28 @@
 
 .form {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     justify-content: flex-start;
-    row-gap: 24px;
+    column-gap: 10px;
+    position: relative;
+}
+
+.formButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    column-gap: 15px;
+    position: absolute;
+    right: -80px;
+    top: 20px;
+}
+
+.button {
+    background: transparent;
+    border: none;
+    padding: 0;
 }
 
 .inputs {

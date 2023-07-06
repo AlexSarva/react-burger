@@ -7,29 +7,39 @@ import ResetPassword from '../pages/reset-password/reset-password'
 import ForgotPassword from '../pages/forgot-password/forgot-password'
 import Profile from '../pages/profile/profile'
 import NotFound from '../pages/not-found/not-found'
-import { RequireAuth } from '../../hoc/require-auth'
-import { RestrictAuth } from '../../hoc/restrict-auth'
 import Ingredient from '../pages/ingredient/ingredient'
+import ProtectRoute from '../../hoc/protect-route'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { fetchIngredients } from '../../services/reducers/ingredients'
+import { fetchUserInfo } from '../../services/reducers/auth'
 
 function App () {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(fetchIngredients())
+    dispatch(fetchUserInfo())
+  }, [])
+
   return (
     <Routes>
       <Route path="/" element={<Layout/>}>
         <Route index element={<Main/>}/>
-        <Route path='login' element={<RestrictAuth/>}>
+        <Route path='login' element={<ProtectRoute onlyUnAuth={true}/>}>
           <Route index element={<Login/>}/>
         </Route>
-        <Route path='register' element={<RestrictAuth/>}>
+        <Route path='register' element={<ProtectRoute onlyUnAuth={true}/>}>
           <Route index element={<Register/>}/>
         </Route>
-        <Route path='reset-password' element={<RestrictAuth/>}>
+        <Route path='reset-password' element={<ProtectRoute onlyUnAuth={true}/>}>
           <Route index element={<ResetPassword/>}/>
         </Route>
-        <Route path='forgot-password' element={<RestrictAuth/>}>
+        <Route path='forgot-password' element={<ProtectRoute onlyUnAuth={true}/>}>
           <Route index element={<ForgotPassword/>}/>
         </Route>
         <Route path='/ingredients/:id' element={<Ingredient/>}/>
-        <Route path='profile' element={<RequireAuth/>}>
+        <Route path='profile' element={<ProtectRoute/>}>
           <Route index element={<Profile/>}/>
         </Route>
       </Route>

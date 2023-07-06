@@ -1,13 +1,15 @@
 import style from './reset-password.module.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import authApi from '../../../utils/auth-api'
 import { useMutation } from 'react-query'
 import Preloader from '../../preloader/preloader'
 import ApiError from '../../api-error/api-error'
 
 const ResetPassword = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
   const [state, setState] = useState({
     password: '',
     token: ''
@@ -27,6 +29,12 @@ const ResetPassword = () => {
     e.preventDefault()
     mutation.mutate(state)
   }
+
+  useEffect(() => {
+    if (!location.state || location.state.from !== '/forgot-password') {
+      navigate('/forgot-password')
+    }
+  }, [location])
 
   return (
     <>

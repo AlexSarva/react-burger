@@ -1,7 +1,7 @@
 import style from './burger-ingredients.module.css'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { decrementCount, fetchIngredients } from '../../services/reducers/ingredients'
+import { decrementCount } from '../../services/reducers/ingredients'
 import Preloader from '../preloader/preloader'
 import NoContent from '../no-content/no-content'
 import { removeIngredient } from '../../services/reducers/burger-constructor'
@@ -41,12 +41,6 @@ const BurgerIngredients = () => {
   }
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchIngredients())
-    }
-  }, [status, dispatch])
-
-  useEffect(() => {
     const handleScroll = () => {
       if (!bunRef.current || !sauceRef.current || !mainRef.current || !ingredientContainerRef.current) {
         return
@@ -82,25 +76,23 @@ const BurgerIngredients = () => {
   const outline = currentType !== 'new' && isHover ? '2px solid purple' : ''
 
   return (
-    <>
-      <section className={`${style.container}`}>
-        <h1 className={'text text_type_main-large mt-10 mb-5'}>Соберите бургер</h1>
-        <IngredientsNavigation currentCategory={highlightedCategory} onPickCategory={handlePickCategory}
-                               refs={{ bun: bunRef, sauce: sauceRef, main: mainRef }}/>
-        <div ref={ingredientContainerRef} className={`${style.ingredients} custom-scroll`} style={{ outline }}>
-          {status === 'loading'
-            ? <Preloader/>
-            : (status === 'failed')
-                ? <NoContent/>
-                : <div ref={dropTarget}>
-                <Ingredients ref={bunRef} type={'bun'}/>
-                <Ingredients ref={sauceRef} type={'sauce'}/>
-                <Ingredients ref={mainRef} type={'main'}/>
-              </div>
-          }
-        </div>
-      </section>
-    </>
+    <section className={`${style.container}`}>
+      <h1 className={'text text_type_main-large mt-10 mb-5'}>Соберите бургер</h1>
+      <IngredientsNavigation currentCategory={highlightedCategory} onPickCategory={handlePickCategory}
+                             refs={{ bun: bunRef, sauce: sauceRef, main: mainRef }}/>
+      <div ref={ingredientContainerRef} className={`${style.ingredients} custom-scroll`} style={{ outline }}>
+        {status === 'loading'
+          ? <Preloader/>
+          : (status === 'failed')
+              ? <NoContent/>
+              : <div ref={dropTarget}>
+              <Ingredients ref={bunRef} type={'bun'}/>
+              <Ingredients ref={sauceRef} type={'sauce'}/>
+              <Ingredients ref={mainRef} type={'main'}/>
+            </div>
+        }
+      </div>
+    </section>
   )
 }
 

@@ -1,6 +1,6 @@
 import { getCookie } from './cookie'
-
-const AUTH_SERVICE = 'https://norma.nomoreparties.space/api'
+import { request, requestWithRefresh } from './api-utils'
+import { AUTH_SERVICE } from './constants'
 
 const headers = {
   Accept: 'application/json',
@@ -8,30 +8,10 @@ const headers = {
   // 'Authorization': `Basic ${token}`,
 }
 
-const checkResponse = (res) => {
-  if (res.ok) {
-    return res.json()
-  } else {
-    return res.json().then((data) => {
-      // eslint-disable-next-line prefer-promise-reject-errors
-      return Promise.reject({
-        status: res.status,
-        statusText: res.statusText,
-        body: data
-      })
-    })
-  }
-}
-
 const authApi = () => {
-  const request = (path, options) => {
-    const url = AUTH_SERVICE + path
-    // принимает два аргумента: урл и объект опций, как и `fetch`
-    return fetch(url, options).then(checkResponse)
-  }
   const register = (payload) => {
     const { email, password, name } = payload
-    return request('/auth/register', {
+    return request(AUTH_SERVICE, '/auth/register', {
       headers,
       method: 'POST',
       mode: 'cors',
@@ -48,7 +28,7 @@ const authApi = () => {
 
   const login = (payload) => {
     const { email, password } = payload
-    return request('/auth/login', {
+    return request(AUTH_SERVICE, '/auth/login', {
       headers,
       method: 'POST',
       mode: 'cors',
@@ -62,11 +42,12 @@ const authApi = () => {
     })
   }
 
-  const userInfo = ({ accessToken }) => {
-    return request('/auth/user', {
+  const userInfo = () => {
+    const token = getCookie('accessToken')
+    return requestWithRefresh(AUTH_SERVICE, '/auth/user', {
       headers: {
         ...headers,
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${token}`
       },
       method: 'GET',
       mode: 'cors',
@@ -79,7 +60,7 @@ const authApi = () => {
   const patchUser = (payload) => {
     const { name, email, password } = payload
     const token = getCookie('accessToken')
-    return request('/auth/user', {
+    return requestWithRefresh(AUTH_SERVICE, '/auth/user', {
       headers: {
         ...headers,
         Authorization: `Bearer ${token}`
@@ -95,22 +76,8 @@ const authApi = () => {
     })
   }
 
-  const refreshToken = () => {
-    return request('/auth/token', {
-      headers,
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-      body: JSON.stringify({
-        token: getCookie('refreshToken')
-      })
-    })
-  }
-
   const logout = () => {
-    return request('/auth/logout', {
+    return request(AUTH_SERVICE, '/auth/logout', {
       headers,
       method: 'POST',
       mode: 'cors',
@@ -125,7 +92,7 @@ const authApi = () => {
 
   const resetPassword = (payload) => {
     const { email } = payload
-    return request('/password-reset', {
+    return request(AUTH_SERVICE, '/password-reset', {
       headers,
       method: 'POST',
       mode: 'cors',
@@ -140,7 +107,7 @@ const authApi = () => {
 
   const changePassword = (payload) => {
     const { password, token } = payload
-    return request('/password-reset/reset', {
+    return request(AUTH_SERVICE, '/password-reset/reset', {
       headers,
       method: 'POST',
       mode: 'cors',
@@ -155,7 +122,7 @@ const authApi = () => {
   }
 
   return {
-    register, login, userInfo, refreshToken, logout, resetPassword, changePassword, patchUser
+    register, login, userInfo, logout, resetPassword, changePassword, patchUser
   }
 }
 

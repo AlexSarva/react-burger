@@ -2,12 +2,7 @@ import style from './ingredient.module.css'
 import IngredientDetails from '../../ingredient-details/ingredient-details'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchIngredients,
-  selectIngredientById,
-  selectIngredientsStatus
-} from '../../../services/reducers/ingredients'
-import { useEffect } from 'react'
+import { selectIngredientById, selectIngredientsStatus } from '../../../services/reducers/ingredients'
 import Preloader from '../../preloader/preloader'
 import NoContent from '../../no-content/no-content'
 import Modal from '../../modal/modal'
@@ -26,12 +21,6 @@ const Ingredient = () => {
   const status = useSelector(selectIngredientsStatus)
   const { id } = useParams()
   const ingredient = useSelector((state) => selectIngredientById(id)(state))
-
-  useEffect(() => {
-    if (!ingredient) {
-      dispatch(fetchIngredients())
-    }
-  }, [dispatch, ingredient])
 
   return (
     <>

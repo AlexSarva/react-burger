@@ -1,25 +1,16 @@
 import style from './login.module.css'
 import { Button, EmailInput, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchLogin,
-  resetError,
-  resetStatus,
-  selectErrors,
-  selectIsLogged,
-  selectStatuses
-} from '../../../services/reducers/auth'
+import { fetchLogin, resetError, resetStatus, selectErrors, selectStatuses } from '../../../services/reducers/auth'
 import ApiError from '../../api-error/api-error'
 import Preloader from '../../preloader/preloader'
 
 const Login = () => {
   const { loginStatus } = useSelector(selectStatuses)
   const { loginError, isError } = useSelector(selectErrors)
-  const isLogged = useSelector(selectIsLogged)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const [state, setState] = useState({
     email: '',
     password: ''
@@ -45,12 +36,6 @@ const Login = () => {
     dispatch(resetError({ error: 'loginError' }))
     dispatch(resetStatus({ status: 'loginStatus' }))
   }
-
-  useEffect(() => {
-    if (isLogged) {
-      navigate('/')
-    }
-  }, [isLogged, navigate])
 
   useEffect(() => {
     dispatch(resetError({ error: 'loginError' }))
