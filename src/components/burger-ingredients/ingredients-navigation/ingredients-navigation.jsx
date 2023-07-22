@@ -1,20 +1,19 @@
-import React, {useEffect, useState} from "react";
-import style from "./ingredients-navigation.module.css";
-import {Tab} from "@ya.praktikum/react-developer-burger-ui-components";
-import PropTypes from "prop-types";
+import React, { useEffect, useState } from 'react'
+import style from './ingredients-navigation.module.css'
+import { Tab } from '@ya.praktikum/react-developer-burger-ui-components'
+import PropTypes from 'prop-types'
 
-const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
-
-  const [activeCategory, setActiveCategory] = useState(null);
+const IngredientsNavigation = ({ onPickCategory, currentCategory, refs }) => {
+  const [activeCategory, setActiveCategory] = useState(null)
 
   const handleClick = (e) => {
-    onPickCategory(e);
-    refs[e].current.scrollIntoView({behavior: "smooth"});
+    onPickCategory(e)
+    refs[e].current.scrollIntoView({ behavior: 'smooth' })
   }
 
   useEffect(() => {
-    setActiveCategory(currentCategory);
-  }, [currentCategory]);
+    setActiveCategory(currentCategory)
+  }, [currentCategory])
 
   return (
     <div className={style.container}>
@@ -29,13 +28,12 @@ const IngredientsNavigation = ({onPickCategory, currentCategory, refs}) => {
       </Tab>
     </div>
   )
-};
+}
 
 IngredientsNavigation.propTypes = {
   onPickCategory: PropTypes.func.isRequired,
   currentCategory: PropTypes.string.isRequired,
   refs: PropTypes.object.isRequired
-};
+}
 
-export default IngredientsNavigation;
-
+export default IngredientsNavigation

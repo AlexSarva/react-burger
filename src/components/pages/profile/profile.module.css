@@ -1,0 +1,63 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    column-gap: 60px;
+}
+
+.navigation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    row-gap: 34px;
+    list-style: none;
+}
+
+.navigationElement {
+    margin: 0;
+    padding: 0;
+}
+
+.form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    column-gap: 10px;
+    position: relative;
+}
+
+.formButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    column-gap: 15px;
+    position: absolute;
+    right: -80px;
+    top: 20px;
+}
+
+.button {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    row-gap: 24px;
+}
+
+.link {
+    text-decoration: none;
+}
+
+.link_active {
+    color: #F2F2F3
+}

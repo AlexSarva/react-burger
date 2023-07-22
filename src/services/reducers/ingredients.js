@@ -1,16 +1,17 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import { ingredientsApi } from "../../utils/ingredients-api";
-import { ingredientsTypes } from "../../utils/constants";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { ingredientsApi } from '../../utils/ingredients-api'
+import { ingredientsTypes } from '../../utils/constants'
+import { createSelector } from 'reselect'
 
-const { getIngredients } = ingredientsApi();
+const { getIngredients } = ingredientsApi()
 
 export const fetchIngredients = createAsyncThunk('ingredients/fetch', async (_, thunkAPI) => {
   try {
-    return await getIngredients();
+    return await getIngredients()
   } catch (error) {
-    return thunkAPI.rejectWithValue(error);
+    return thunkAPI.rejectWithValue(error)
   }
-});
+})
 
 const ingredientsSlice = createSlice({
   name: 'ingredients',
@@ -20,40 +21,41 @@ const ingredientsSlice = createSlice({
       main: [],
       sauce: []
     },
+    allItems: [],
     status: 'idle',
-    error: null,
+    error: null
   },
   reducers: {
     incrementCount: (state, action) => {
-      const { _id, type } = action.payload;
+      const { _id, type } = action.payload
       if (type === ingredientsTypes.bun) {
         state.items.bun.forEach((item) => {
-          item.count = 0;
-        });
+          item.count = 0
+        })
       }
-      const item = state.items[type].find((item) => item._id === _id);
+      const item = state.items[type].find((item) => item._id === _id)
       if (item) {
-        item.count = (item.count || 0) + 1;
+        item.count = (item.count || 0) + 1
       }
     },
     decrementCount: (state, action) => {
-      const { _id, type } = action.payload;
-      const item = state.items[type].find((item) => item._id === _id);
+      const { _id, type } = action.payload
+      const item = state.items[type].find((item) => item._id === _id)
       if (item && item.count > 0) {
-        item.count -= 1;
+        item.count -= 1
       }
     },
     clearIngredients: (state) => {
       state.items.bun.forEach((item) => {
-        item.count = 0;
-      });
+        item.count = 0
+      })
       state.items.main.forEach((item) => {
-        item.count = 0;
-      });
+        item.count = 0
+      })
       state.items.sauce.forEach((item) => {
-        item.count = 0;
-      });
-    },
+        item.count = 0
+      })
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -62,10 +64,11 @@ const ingredientsSlice = createSlice({
         state.error = null
       })
       .addCase(fetchIngredients.fulfilled, (state, action) => {
-        if (action.payload.success === true ) {
+        if (action.payload.success === true) {
           state.items.bun = action.payload.data.filter(item => item.type === ingredientsTypes.bun)
           state.items.main = action.payload.data.filter(item => item.type === ingredientsTypes.main)
           state.items.sauce = action.payload.data.filter(item => item.type === ingredientsTypes.sauce)
+          state.allItems = action.payload.data
           state.status = 'succeeded'
         } else {
           state.status = 'failed'
@@ -78,7 +81,21 @@ const ingredientsSlice = createSlice({
       })
   }
 
-});
+})
 
-export const { incrementCount, decrementCount, clearIngredients } = ingredientsSlice.actions;
-export default ingredientsSlice.reducer;
+export const selectIngredients = (state) => state.ingredients.allItems
+
+export const selectIngredientsStatus = (state) => state.ingredients.status
+
+export const selectIngredientById = (id) => createSelector(
+  selectIngredients,
+  (items) => {
+    if (items) {
+      return items.find((item) => item._id === id)
+    }
+    return null
+  }
+)
+
+export const { incrementCount, decrementCount, clearIngredients } = ingredientsSlice.actions
+export default ingredientsSlice.reducer

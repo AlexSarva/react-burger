@@ -16,9 +16,8 @@
     font-family: 'JetBrains Mono', Arial, sans-serif;
     background: #131316;
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    column-gap: 48px;
     position: relative;
 }
