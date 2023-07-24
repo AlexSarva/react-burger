@@ -1,5 +1,5 @@
 {
-  "parser": "@babel/eslint-parser",
+  "parser": "@typescript-eslint/parser",
   "settings": {
     "react": {
       "version": "detect"
@@ -14,7 +14,8 @@
     "standard",
     "plugin:react/jsx-runtime",
     "plugin:testing-library/react",
-    "plugin:jest/all"
+    "plugin:jest/all",
+    "plugin:@typescript-eslint/recommended"
   ],
   "parserOptions": {
     "sourceType": "module"
