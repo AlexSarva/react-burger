@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux'
 import { fetchIngredients } from '../../services/reducers/ingredients'
 import { fetchUserInfo } from '../../services/reducers/auth'
 import { FetchDispatch } from '../../index'
+import Feed from '../pages/feed'
 
 function App () {
   const dispatch: FetchDispatch = useDispatch()
@@ -27,6 +28,7 @@ function App () {
     <Routes>
       <Route path="/" element={<Layout/>}>
         <Route index element={<Main/>}/>
+        <Route path='feed' element={<Feed/>}/>
         <Route path='login' element={<ProtectRoute onlyUnAuth={true}/>}>
           <Route index element={<Login/>}/>
         </Route>

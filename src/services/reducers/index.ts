@@ -5,6 +5,7 @@ import burgerConstructorReducer, { BurgerConstructorState } from './burger-const
 import ordersReducer, { OrdersState } from './orders'
 import navReducer, { NavState } from './nav'
 import authReducer, { AuthState } from './auth'
+import feedReducer, { FeedState } from './feed'
 
 const rootReducer = combineReducers({
   ingredients: ingredientsReducer,
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
   ingredientInfo: ingredientInfoReducer,
   orders: ordersReducer,
   nav: navReducer,
-  auth: authReducer
+  auth: authReducer,
+  feed: feedReducer
 })
 
 export type RootState = {
@@ -22,6 +24,7 @@ export type RootState = {
   orders: OrdersState,
   nav: NavState,
   auth: AuthState
+  feed: FeedState
 }
 
 export default rootReducer
