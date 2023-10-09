@@ -2,17 +2,17 @@ import style from './login.module.css'
 import { Button, EmailInput, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
 import { FormEvent, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { fetchLogin, resetError, resetStatus, selectErrors, selectStatuses } from '../../../services/reducers/auth'
 import ApiError from '../../api-error/api-error'
 import Preloader from '../../preloader/preloader'
 import { TAuth } from '../../../utils/auth-api'
-import { FetchDispatch } from '../../../index'
+import { FetchDispatch, useAppDispatch } from '../../../index'
 
 const Login = () => {
   const { loginStatus } = useSelector(selectStatuses)
   const { loginError, isError } = useSelector(selectErrors)
-  const dispatch: FetchDispatch = useDispatch()
+  const dispatch: FetchDispatch = useAppDispatch()
   const [state, setState] = useState<TAuth>({
     email: '',
     password: ''

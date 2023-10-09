@@ -1,14 +1,15 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useDrop } from 'react-dnd'
 import { addIngredient } from '../../../services/reducers/burger-constructor'
 import { incrementCount } from '../../../services/reducers/ingredients'
 import style from './empty-constructor.module.css'
 import { RootState } from '../../../services/reducers'
 import { TDragConstructorElementExpanded } from '../drag-constructor-element/drag-constructor-element'
+import { useAppDispatch } from '../../../index'
 
 const EmptyConstructor = () => {
   const { options } = useSelector((state: RootState) => state.burgerConstructor)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const [{ isHover }, dropTarget] = useDrop({

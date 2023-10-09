@@ -1,7 +1,6 @@
 import style from './feed.module.css'
 import OrdersList from '../../orders-list'
 import FeedStatus from '../../feed-status'
-
 const Feed = () => {
   return (
     <main className={style.container}>

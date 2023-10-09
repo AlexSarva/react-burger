@@ -1,6 +1,6 @@
 import constructorStyle from './burger-constructor.module.css'
-import { useDispatch, useSelector } from 'react-redux'
-import { clearOrder, hideOrder } from '../../services/reducers/orders'
+import { useSelector } from 'react-redux'
+import { clearOrder, hideOrder } from '../../services/reducers/order'
 import Modal from '../modal/modal'
 import Preloader from '../preloader/preloader'
 import NoContent from '../no-content/no-content'
@@ -12,11 +12,12 @@ import { useEffect } from 'react'
 import { clearConstructor } from '../../services/reducers/burger-constructor'
 import { clearIngredients } from '../../services/reducers/ingredients'
 import { RootState } from '../../services/reducers'
+import { useAppDispatch } from '../../index'
 
 const BurgerConstructor = () => {
-  const { status, showOrder } = useSelector((state: RootState) => state.orders)
+  const { status, showOrder } = useSelector((state: RootState) => state.order)
   const { bun, options } = useSelector((state: RootState) => state.burgerConstructor)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const closeModal = () => {
     dispatch(hideOrder())
     dispatch(clearOrder())

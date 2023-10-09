@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useDrop } from 'react-dnd'
 import { addIngredient } from '../../../services/reducers/burger-constructor'
 import { incrementCount } from '../../../services/reducers/ingredients'
@@ -9,11 +9,12 @@ import DragConstructorElement from '../drag-constructor-element/drag-constructor
 import { IngredientType, TIngredient } from '../../../utils/ingrediens-types'
 import { RootState } from '../../../services/reducers'
 import { TDragConstructorElement } from '../../burger-ingredients/ingredient/ingredient'
+import { useAppDispatch } from '../../../index'
 
 const BurgerComponents = () => {
   const [usedType, setUsedType] = useState<IngredientType | null>(null)
   const { bun, options } = useSelector((state: RootState) => state.burgerConstructor)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const [{ isHover }, dropTarget] = useDrop({

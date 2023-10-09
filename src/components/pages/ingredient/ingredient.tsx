@@ -1,19 +1,20 @@
 import style from './ingredient.module.css'
 import IngredientDetails from '../../ingredient-details/ingredient-details'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { selectIngredientById, selectIngredientsStatus } from '../../../services/reducers/ingredients'
 import Preloader from '../../preloader/preloader'
 import NoContent from '../../no-content/no-content'
 import Modal from '../../modal/modal'
 import { hideIngredientInfo } from '../../../services/reducers/ingredient-info'
 import { RootState } from '../../../services/reducers'
+import { useAppDispatch } from '../../../index'
 
 const Ingredient = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const modal = location.state?.modal
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { itemDetails } = useSelector((state: RootState) => state.ingredientInfo)
   const closeModal = () => {
     dispatch(hideIngredientInfo())

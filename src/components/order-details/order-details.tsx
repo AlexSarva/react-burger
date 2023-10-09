@@ -1,9 +1,9 @@
 import modalOrderStyle from './order-details.module.css'
 import { useSelector } from 'react-redux'
-import { RootState } from '../../services/reducers'
+import { selectOrder } from '../../services/reducers/order'
 
 const OrderDetails = () => {
-  const { order } = useSelector((state: RootState) => state.orders)
+  const order = useSelector(selectOrder)
 
   return (
     <>

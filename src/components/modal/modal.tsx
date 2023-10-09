@@ -33,12 +33,16 @@ const Modal = ({ title, children, onClose }: ModalProps) => {
     <>
       <ModalOverlay onClick={onClose}/>
       <div className={modalStyle.modal}>
-        <div className={`${modalStyle.modal_header} mt-10`}>
+        {title !== ''
+          ? <div className={`${modalStyle.modal_header} mt-10`}>
           <h2 className={`${modalStyle.modal_title} text text_type_main-large`}>{title}</h2>
           <div className={modalStyle.modal_closeBtn} onClick={onClose}>
             <CloseIcon type="primary"/>
           </div>
         </div>
+          : <div className={modalStyle.modal_closeBtn_right} onClick={onClose}>
+            <CloseIcon type="primary"/>
+          </div>}
         <div className={modalStyle.modal_body}>{children}</div>
       </div>
     </>,
