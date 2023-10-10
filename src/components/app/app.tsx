@@ -19,7 +19,6 @@ import Feed from '../pages/feed'
 import ProfileLayout from '../pages/profile-layout'
 
 function App () {
-  console.log('env:', process.env.NODE_ENV)
   const dispatch: FetchDispatch = useAppDispatch()
 
   useEffect(() => {
