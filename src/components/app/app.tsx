@@ -21,6 +21,7 @@ import { wsInit } from '../../services/reducers/orders'
 import ProfileLayout from '../pages/profile-layout'
 
 function App () {
+  console.log('env:', process.env.NODE_ENV)
   const dispatch: FetchDispatch = useAppDispatch()
   const token = useSelector(selectToken)
 
@@ -35,8 +36,10 @@ function App () {
     <Routes>
       <Route path="/" element={<Layout/>}>
         <Route index element={<Main/>}/>
-        <Route path='feed' element={<Feed/>}/>
-        <Route path='feed/:id' element={<OrderIngredients type={'feed'}/>}/>
+        <Route path='feed' element={<ProtectRoute />}>
+          <Route index element={<Feed/>}/>
+          <Route path='feed/:id' element={<OrderIngredients type={'feed'}/>}/>
+        </Route>
         <Route path='login' element={<ProtectRoute onlyUnAuth={true}/>}>
           <Route index element={<Login/>}/>
         </Route>

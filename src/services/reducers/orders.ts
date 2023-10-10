@@ -5,7 +5,7 @@ import { TIngredient } from '../../utils/ingrediens-types'
 
 export type TOrder = {
   _id: string
-  ingredients: Array<string>
+  ingredients: Array<string | null>
   name: string
   status: 'done' | 'pending' | 'created'
   number: number
@@ -135,13 +135,17 @@ export const selectFeedOrders = createSelector(
     if (!orders.length) return []
     if (!allItems || allItems.length === 0) return []
     return orders.map((order) => {
-      const ingredients = order.ingredients.map((id) => {
-        const fullInfo = allItems.find((item) => item._id === id)
-        if (typeof fullInfo === 'undefined') {
-          throw new Error(`Unknown ingredient id: ${id}`)
+      const ingredients = [] as Array<TIngredient>
+      for (const id of order.ingredients) {
+        if (id && id !== '') {
+          const fullInfo = allItems.find((item) => item._id === id)
+          if (typeof fullInfo === 'undefined') {
+            throw new Error(`Unknown ingredient id: ${id}`)
+          }
+          ingredients.push(fullInfo)
         }
-        return fullInfo
-      })
+      }
+
       const ingredientsPrice = ingredients.reduce(
         (total: number, option: TIngredient) => total + option.price,
         0

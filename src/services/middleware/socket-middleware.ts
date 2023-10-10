@@ -2,23 +2,22 @@ import { FetchDispatch, RootState } from '../../index'
 import { Middleware, MiddlewareAPI, AnyAction } from 'redux'
 import { TFeedActions, TMessageOrders } from '../reducers/orders'
 
-enum socketType {
+export enum SocketType {
   feed = 'feed',
   my = 'my'
 }
 
 type TSockedMiddleware = {
-  ({ wsFeedUrl, wsMyUrl, wsActions }: {
-    wsFeedUrl: string,
-    wsMyUrl: string,
-    wsActions: TFeedActions
+  ({ wsUrl, wsActions }: {
+    wsUrl: string,
+    wsActions: TFeedActions,
+    entityType: SocketType
   }): Middleware
 }
 
-export const socketMiddleware: TSockedMiddleware = ({ wsFeedUrl, wsMyUrl, wsActions }) => {
+export const socketMiddleware: TSockedMiddleware = ({ wsUrl, wsActions, entityType }) => {
   return ((store: MiddlewareAPI<FetchDispatch, RootState>) => {
-    let socketFeed: WebSocket | null = null
-    let socketMy: WebSocket | null = null
+    let socket: WebSocket | null = null
 
     return next => (appAction: AnyAction) => {
       const { dispatch, getState } = store
@@ -29,37 +28,32 @@ export const socketMiddleware: TSockedMiddleware = ({ wsFeedUrl, wsMyUrl, wsActi
       } = wsActions
       const { token } = getState().auth
 
-      if (type === wsInit.type && token) {
-        if (payload === socketType.my) {
-          socketMy = new WebSocket(`${wsMyUrl}?token=${token}`)
-        }
-        if (payload === socketType.feed) {
-          socketFeed = new WebSocket(`${wsFeedUrl}?token=${token}`)
-        }
+      if (type === wsInit.type && payload === entityType && token) {
+        socket = new WebSocket(`${wsUrl}?token=${token}`)
       }
-      if (socketFeed) {
-        socketFeed.onopen = () => {
-          dispatch(onOpen(socketType.feed))
+      if (socket) {
+        socket.onopen = () => {
+          dispatch(onOpen(entityType))
         }
 
-        socketFeed.onerror = event => {
+        socket.onerror = event => {
           dispatch(onError({
-            type: socketType.feed,
+            type: entityType,
             error: event
           }))
         }
 
-        socketFeed.onmessage = event => {
+        socket.onmessage = event => {
           const { data } = event
           const parsedData: TMessageOrders = JSON.parse(data)
           const { success, total, totalToday, ...restParsedData } = parsedData
           if (success) {
             dispatch(updateOrders({
-              type: socketType.feed,
+              type: entityType,
               orders: restParsedData.orders
             }))
             dispatch(setOrdersCnt({
-              type: socketType.feed,
+              type: entityType,
               cnt: {
                 total,
                 totalToday
@@ -68,44 +62,8 @@ export const socketMiddleware: TSockedMiddleware = ({ wsFeedUrl, wsMyUrl, wsActi
           }
         }
 
-        socketFeed.onclose = () => {
-          dispatch(onClose(socketType.feed))
-        }
-      }
-
-      if (socketMy) {
-        socketMy.onopen = () => {
-          dispatch(onOpen(socketType.my))
-        }
-
-        socketMy.onerror = event => {
-          dispatch(onError({
-            type: socketType.my,
-            error: event
-          }))
-        }
-
-        socketMy.onmessage = event => {
-          const { data } = event
-          const parsedData: TMessageOrders = JSON.parse(data)
-          const { success, total, totalToday, ...restParsedData } = parsedData
-          if (success) {
-            dispatch(updateOrders({
-              type: socketType.my,
-              orders: restParsedData.orders
-            }))
-            dispatch(setOrdersCnt({
-              type: socketType.my,
-              cnt: {
-                total,
-                totalToday
-              }
-            }))
-          }
-        }
-
-        socketMy.onclose = () => {
-          dispatch(onClose(socketType.my))
+        socket.onclose = () => {
+          dispatch(onClose(entityType))
         }
       }
 

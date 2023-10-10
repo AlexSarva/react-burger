@@ -12,7 +12,7 @@ import rootReducer from './services/reducers'
 import { Provider, useDispatch } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { socketMiddleware } from './services/middleware/socket-middleware'
+import { socketMiddleware, SocketType } from './services/middleware/socket-middleware'
 import { onClose, onError, onOpen, setOrdersCnt, updateOrders, wsInit } from './services/reducers/orders'
 
 const queryClient = new QueryClient()
@@ -22,11 +22,18 @@ const MY_URL = 'wss://norma.nomoreparties.space/orders'
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger, socketMiddleware({
-    wsFeedUrl: FEED_URL,
-    wsMyUrl: MY_URL,
-    wsActions: { setOrdersCnt, wsInit, onOpen, onError, updateOrders, onClose }
-  })),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(
+    ...(process.env.NODE_ENV !== 'production' ? [logger] : []),
+    socketMiddleware({
+      wsUrl: FEED_URL,
+      entityType: SocketType.feed,
+      wsActions: { setOrdersCnt, wsInit, onOpen, onError, updateOrders, onClose }
+    }),
+    socketMiddleware({
+      wsUrl: MY_URL,
+      entityType: SocketType.my,
+      wsActions: { setOrdersCnt, wsInit, onOpen, onError, updateOrders, onClose }
+    })),
   devTools: process.env.NODE_ENV !== 'production'
 })
 
