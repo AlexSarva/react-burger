@@ -8,6 +8,7 @@ import Preloader from '../../preloader/preloader'
 import ApiError from '../../api-error/api-error'
 import { TAuth } from '../../../utils/auth-api'
 import { FetchDispatch, useAppDispatch } from '../../../index'
+import { onClose } from '../../../services/reducers/orders'
 
 const Register = () => {
   const { registerStatus } = useSelector(selectStatuses)
@@ -43,7 +44,9 @@ const Register = () => {
 
   useEffect(() => {
     dispatch(resetError({ error: 'registerError' }))
-  }, [dispatch])
+    dispatch(onClose('feed'))
+    dispatch(onClose('my'))
+  }, [dispatch, onClose])
 
   return (
     <>

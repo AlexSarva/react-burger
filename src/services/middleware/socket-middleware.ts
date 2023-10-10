@@ -31,6 +31,12 @@ export const socketMiddleware: TSockedMiddleware = ({ wsUrl, wsActions, entityTy
       if (type === wsInit.type && payload === entityType && token) {
         socket = new WebSocket(`${wsUrl}?token=${token}`)
       }
+
+      if (type === onClose.type && payload === entityType) {
+        socket?.close()
+        socket = null
+      }
+
       if (socket) {
         socket.onopen = () => {
           dispatch(onOpen(entityType))

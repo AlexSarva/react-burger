@@ -13,24 +13,19 @@ import Orders from '../pages/orders'
 import ProtectRoute from '../../hoc/protect-route'
 import { useEffect } from 'react'
 import { fetchIngredients } from '../../services/reducers/ingredients'
-import { fetchUserInfo, selectToken } from '../../services/reducers/auth'
+import { fetchUserInfo } from '../../services/reducers/auth'
 import { FetchDispatch, useAppDispatch } from '../../index'
 import Feed from '../pages/feed'
-import { useSelector } from 'react-redux'
-import { wsInit } from '../../services/reducers/orders'
 import ProfileLayout from '../pages/profile-layout'
 
 function App () {
   console.log('env:', process.env.NODE_ENV)
   const dispatch: FetchDispatch = useAppDispatch()
-  const token = useSelector(selectToken)
 
   useEffect(() => {
     dispatch(fetchIngredients())
     dispatch(fetchUserInfo())
-    dispatch(wsInit('feed'))
-    dispatch(wsInit('my'))
-  }, [token, dispatch])
+  }, [dispatch])
 
   return (
     <Routes>
@@ -38,7 +33,7 @@ function App () {
         <Route index element={<Main/>}/>
         <Route path='feed' element={<ProtectRoute />}>
           <Route index element={<Feed/>}/>
-          <Route path='feed/:id' element={<OrderIngredients type={'feed'}/>}/>
+          <Route path=':id' element={<OrderIngredients type={'feed'}/>}/>
         </Route>
         <Route path='login' element={<ProtectRoute onlyUnAuth={true}/>}>
           <Route index element={<Login/>}/>

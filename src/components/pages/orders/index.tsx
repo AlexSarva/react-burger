@@ -1,10 +1,16 @@
 import styles from './orders.module.css'
 import { useSelector } from 'react-redux'
-import { selectMyOrders } from '../../../services/reducers/orders'
+import { selectMyOrders, wsInit } from '../../../services/reducers/orders'
 import Order from '../../order'
+import { useAppDispatch } from '../../../index'
+import { useEffect } from 'react'
 
 const Orders = () => {
   const orders = useSelector(selectMyOrders)
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    dispatch(wsInit('my'))
+  }, [dispatch, wsInit])
 
   return (
     <section className={`${styles.container} custom-scroll`}>

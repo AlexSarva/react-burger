@@ -6,10 +6,13 @@ import authApi, { TResetPasswordConfirm } from '../../../utils/auth-api'
 import { useMutation } from 'react-query'
 import Preloader from '../../preloader/preloader'
 import ApiError from '../../api-error/api-error'
+import { onClose } from '../../../services/reducers/orders'
+import { useAppDispatch } from '../../../index'
 
 const ResetPassword = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const [state, setState] = useState<TResetPasswordConfirm>({
     password: '',
     token: ''
@@ -35,6 +38,11 @@ const ResetPassword = () => {
       navigate('/forgot-password')
     }
   }, [location])
+
+  useEffect(() => {
+    dispatch(onClose('feed'))
+    dispatch(onClose('my'))
+  }, [dispatch, onClose])
 
   return (
     <>

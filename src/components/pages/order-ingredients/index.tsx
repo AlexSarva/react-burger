@@ -6,11 +6,11 @@ import style from '../ingredient/ingredient.module.css'
 import OrderIngredientsDetails from '../../order-ingredients-details'
 import {
   selectOrderByNumberType,
-  TExtendedOrder
+  TExtendedOrder, wsInit
 } from '../../../services/reducers/orders'
 import Preloader from '../../preloader/preloader'
 import { useAppDispatch } from '../../../index'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 
 type OrderIngredientsProps = {
   type: 'feed' | 'my'
@@ -27,6 +27,15 @@ const OrderIngredients: FC<OrderIngredientsProps> = ({ type }) => {
   const { id } = useParams() as { id: string }
 
   const order = useSelector(selectOrderByNumberType(id, type)) as TExtendedOrder
+
+  useEffect(() => {
+    if (type === 'feed') {
+      dispatch(wsInit('feed'))
+    }
+    if (type === 'my') {
+      dispatch(wsInit('my'))
+    }
+  }, [dispatch, wsInit])
 
   return (
     <>

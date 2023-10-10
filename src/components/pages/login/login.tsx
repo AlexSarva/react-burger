@@ -8,6 +8,7 @@ import ApiError from '../../api-error/api-error'
 import Preloader from '../../preloader/preloader'
 import { TAuth } from '../../../utils/auth-api'
 import { FetchDispatch, useAppDispatch } from '../../../index'
+import { onClose } from '../../../services/reducers/orders'
 
 const Login = () => {
   const { loginStatus } = useSelector(selectStatuses)
@@ -41,7 +42,9 @@ const Login = () => {
 
   useEffect(() => {
     dispatch(resetError({ error: 'loginError' }))
-  }, [dispatch])
+    dispatch(onClose('feed'))
+    dispatch(onClose('my'))
+  }, [dispatch, onClose])
 
   return (
     <>
