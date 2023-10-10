@@ -1,5 +1,5 @@
 import style from './status-list.module.css'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { TOrder } from '../../../services/reducers/orders'
 
 type StatusListProps = {
@@ -12,13 +12,13 @@ const MAX_ORDERS_PER_COLUMN = 10
 const MAX_ORDERS = 40
 
 const StatusList: FC<StatusListProps> = ({ label, orders, color }) => {
-  const numRows = useMemo(() => {
+  const numRows = () => {
     if (orders.length > MAX_ORDERS_PER_COLUMN) {
       return MAX_ORDERS_PER_COLUMN
     } else {
       return orders.length
     }
-  }, [orders])
+  }
 
   return (
     <div className={style.container}>
