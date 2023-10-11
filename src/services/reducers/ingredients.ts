@@ -46,14 +46,11 @@ const ingredientsSlice = createSlice({
   reducers: {
     incrementCount: (state, action: PayloadAction<TIngredient>) => {
       const { _id, type } = action.payload
-      console.log('incrementCount', _id, type)
       if (type === IngredientType.Bun) {
         state.items.bun.forEach((item) => {
           item.count = 0
         })
       }
-      console.log('incrementCount', state.items)
-      console.log('incrementCount', state.items[type])
       const item = state.items[type].find((item) => item._id === _id)
       if (item) {
         item.count = (item.count || 0) + 1

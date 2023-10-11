@@ -4,8 +4,8 @@ import style from './ingredient.module.css'
 import { Counter, CurrencyIcon } from '@ya.praktikum/react-developer-burger-ui-components'
 import { useNavigate } from 'react-router-dom'
 import { showIngredientInfo } from '../../../services/reducers/ingredient-info'
-import { useDispatch } from 'react-redux'
 import { TIngredient } from '../../../utils/ingrediens-types'
+import { useAppDispatch } from '../../../index'
 
 interface TIngredientProps {
   ingredient: TIngredient;
@@ -20,7 +20,7 @@ const Ingredient: FC<TIngredientProps> = ({ ingredient }: TIngredientProps) => {
   const [isCounterActive, setIsCounterActive] = useState(true)
   const navigate = useNavigate()
   const { image, price, name, count } = ingredient
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [{ opacity }, dragRef] = useDrag({
     type: 'pickedIngredient',
     item: (): TDragConstructorElement => {

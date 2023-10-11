@@ -1,0 +1,36 @@
+.container {
+    width: 100%;
+    max-width: 1280px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    column-gap: 60px;
+}
+
+.navigation {
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    row-gap: 34px;
+    list-style: none;
+}
+
+.navigationElement {
+    margin: 0;
+    padding: 0;
+}
+
+.exit {
+    cursor: pointer;
+}
+
+.link {
+    text-decoration: none;
+}
+
+.link_active {
+    color: #F2F2F3
+}

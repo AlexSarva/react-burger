@@ -1,10 +1,8 @@
 import style from './profile.module.css'
-import { Navigate, NavLink } from 'react-router-dom'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { CheckMarkIcon, CloseIcon, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import {
-  fetchLogout,
   fetchPatchUserInfo,
   resetError,
   resetStatus,
@@ -15,7 +13,7 @@ import {
 import Preloader from '../../preloader/preloader'
 import ApiError from '../../api-error/api-error'
 import { TAuthOptional } from '../../../utils/auth-api'
-import { FetchDispatch } from '../../../index'
+import { FetchDispatch, useAppDispatch } from '../../../index'
 
 type FieldState = {
   name: boolean;
@@ -42,7 +40,7 @@ const Profile = () => {
     email: true,
     password: true
   })
-  const dispatch: FetchDispatch = useDispatch()
+  const dispatch: FetchDispatch = useAppDispatch()
 
   const nameRef = useRef<HTMLInputElement>(null)
 
@@ -125,10 +123,6 @@ const Profile = () => {
     })
   }
 
-  const handleLogout = () => {
-    dispatch(fetchLogout())
-  }
-
   useEffect(() => {
     setState((s) => {
       return {
@@ -144,115 +138,90 @@ const Profile = () => {
   if (logoutStatus === 'failed') return <ApiError onRetry={handleRetryLogout} message={logoutError?.reason}/>
 
   return (
-    <>
-      {logoutStatus === 'succeeded'
-        ? <Navigate to={'/login'}/>
-        : <section className={style.container}>
-          <ul className={style.navigation}>
-            <li className={style.navigationElement}>
-              <NavLink to={'/profile'} className={({ isActive }) => isActive
-                ? `text text_type_main-medium ${style.link} ${style.link_active}`
-                : `text text_type_main-medium ${style.link} text_color_inactive`}>Профиль</NavLink>
-            </li>
-            <li className={style.navigationElement}>
-              <NavLink to={'/profile/orders'} className={({ isActive }) => isActive
-                ? `text text_type_main-medium ${style.link} ${style.link_active}`
-                : `text text_type_main-medium ${style.link} text_color_inactive`}>История заказов</NavLink>
-            </li>
-            <li className={style.navigationElement}>
-              <p onClick={handleLogout} className={'text text_type_main-medium text_color_inactive'}>Выход</p>
-            </li>
-            <p className="text text_type_main-default text_color_inactive mt-20">
-              В этом разделе вы можете <br/> изменить свои персональные данные
-            </p>
-          </ul>
-          <div className={style.inputs}>
-            <form
-              onSubmit={(e) => handleSubmit(e, 'name')}
-              onReset={(e) => handleReset(e, 'name')}
-              className={style.form}>
-              <Input name={'name'}
-                     type={'text'}
-                     value={state.name || ''}
-                     icon={'EditIcon'}
-                     ref={nameRef}
-                     disabled={fieldIsDisabled.name}
-                     onIconClick={() => onIconClick('name')}
-                     placeholder="Имя"
-                     onChange={(e) => {
-                       handleChangeState(e.target.name, e.target.value)
-                     }}/>
-              {stateChanged.name &&
-                <div className={style.formButtons}>
-                  <button type='submit' className={style.button}>
-                    <CheckMarkIcon type={'success'}/>
-                  </button>
-                  <button type='reset' className={style.button}>
-                    <CloseIcon type={'error'}/>
-                  </button>
-                </div>
-              }
-            </form>
-            <form
-              onSubmit={(e) => handleSubmit(e, 'email')}
-              onReset={(e) => handleReset(e, 'email')}
-              className={style.form}>
-              <Input value={state.email || ''}
-                     type={'email'}
-                     name={'email'}
-                     placeholder="Логин"
-                     disabled={fieldIsDisabled.email}
-                     onIconClick={() => onIconClick('email')}
-                     icon={'EditIcon'}
-                     onChange={(e) => {
-                       handleChangeState(e.target.name, e.target.value)
-                     }}/>
-              {stateChanged.email &&
-                <div className={style.formButtons}>
-                  <button type='submit' className={style.button}>
-                    <CheckMarkIcon type={'success'}/>
-                  </button>
-                  <button type='reset' className={style.button}>
-                    <CloseIcon type={'error'}/>
-                  </button>
-                </div>
-              }
-            </form>
-            <form
-              onSubmit={(e) => {
-                handleSubmit(e, 'password')
-                setState((s) => {
-                  return {
-                    ...s,
-                    password: ''
-                  }
-                })
-              }}
-              onReset={(e) => handleReset(e, 'password')}
-              className={style.form}>
-              <PasswordInput value={state.password || ''}
-                             name={'password'}
-                             icon={'EditIcon'}
-                             placeholder="Пароль"
-                             onChange={(e) => {
-                               handleChangeState(e.target.name, e.target.value)
-                             }}
-              />
-              {stateChanged.password &&
-                <div className={style.formButtons}>
-                  <button type='submit' className={style.button}>
-                    <CheckMarkIcon type={'success'}/>
-                  </button>
-                  <button type='reset' className={style.button}>
-                    <CloseIcon type={'error'}/>
-                  </button>
-                </div>
-              }
-            </form>
+    <div className={style.inputs}>
+      <form
+        onSubmit={(e) => handleSubmit(e, 'name')}
+        onReset={(e) => handleReset(e, 'name')}
+        className={style.form}>
+        <Input name={'name'}
+               type={'text'}
+               value={state.name || ''}
+               icon={'EditIcon'}
+               ref={nameRef}
+               disabled={fieldIsDisabled.name}
+               onIconClick={() => onIconClick('name')}
+               placeholder="Имя"
+               onChange={(e) => {
+                 handleChangeState(e.target.name, e.target.value)
+               }}/>
+        {stateChanged.name &&
+          <div className={style.formButtons}>
+            <button type='submit' className={style.button}>
+              <CheckMarkIcon type={'success'}/>
+            </button>
+            <button type='reset' className={style.button}>
+              <CloseIcon type={'error'}/>
+            </button>
           </div>
-        </section>
-      }
-    </>
+        }
+      </form>
+      <form
+        onSubmit={(e) => handleSubmit(e, 'email')}
+        onReset={(e) => handleReset(e, 'email')}
+        className={style.form}>
+        <Input value={state.email || ''}
+               type={'email'}
+               name={'email'}
+               placeholder="Логин"
+               disabled={fieldIsDisabled.email}
+               onIconClick={() => onIconClick('email')}
+               icon={'EditIcon'}
+               onChange={(e) => {
+                 handleChangeState(e.target.name, e.target.value)
+               }}/>
+        {stateChanged.email &&
+          <div className={style.formButtons}>
+            <button type='submit' className={style.button}>
+              <CheckMarkIcon type={'success'}/>
+            </button>
+            <button type='reset' className={style.button}>
+              <CloseIcon type={'error'}/>
+            </button>
+          </div>
+        }
+      </form>
+      <form
+        onSubmit={(e) => {
+          handleSubmit(e, 'password')
+          setState((s) => {
+            return {
+              ...s,
+              password: ''
+            }
+          })
+        }}
+        onReset={(e) => handleReset(e, 'password')}
+        className={style.form}>
+        <PasswordInput value={state.password || ''}
+                       name={'password'}
+                       icon={'EditIcon'}
+                       placeholder="Пароль"
+                       onChange={(e) => {
+                         handleChangeState(e.target.name, e.target.value)
+                       }}
+        />
+        {stateChanged.password &&
+          <div className={style.formButtons}>
+            <button type='submit' className={style.button}>
+              <CheckMarkIcon type={'success'}/>
+            </button>
+            <button type='reset' className={style.button}>
+              <CloseIcon type={'error'}/>
+            </button>
+          </div>
+        }
+      </form>
+    </div>
   )
 }
 

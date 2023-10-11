@@ -2,17 +2,18 @@ import style from './register.module.css'
 import { FormEvent, useEffect, useState } from 'react'
 import { Button, EmailInput, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { fetchRegister, resetError, resetStatus, selectErrors, selectStatuses } from '../../../services/reducers/auth'
 import Preloader from '../../preloader/preloader'
 import ApiError from '../../api-error/api-error'
 import { TAuth } from '../../../utils/auth-api'
-import { FetchDispatch } from '../../../index'
+import { FetchDispatch, useAppDispatch } from '../../../index'
+import { onClose } from '../../../services/reducers/orders'
 
 const Register = () => {
   const { registerStatus } = useSelector(selectStatuses)
   const { registerError, isError } = useSelector(selectErrors)
-  const dispatch: FetchDispatch = useDispatch()
+  const dispatch: FetchDispatch = useAppDispatch()
   const [state, setState] = useState<TAuth>({
     name: '',
     email: '',
@@ -43,7 +44,9 @@ const Register = () => {
 
   useEffect(() => {
     dispatch(resetError({ error: 'registerError' }))
-  }, [dispatch])
+    dispatch(onClose('feed'))
+    dispatch(onClose('my'))
+  }, [dispatch, onClose])
 
   return (
     <>

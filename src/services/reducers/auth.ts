@@ -266,6 +266,7 @@ const authSlice = createSlice({
 export default authSlice.reducer
 
 export const selectUser = (state: RootState): TUser | null => state.auth.user
+export const selectToken = (state: RootState): string | null => state.auth.token
 export const selectIsAuthChecked = (state: RootState): boolean => state.auth.isAuthChecked
 export const selectStatuses = (state: RootState): {
   loginStatus: FetchStatus;

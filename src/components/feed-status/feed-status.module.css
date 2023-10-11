@@ -1,0 +1,19 @@
+.container {
+    width: 600px;
+    height: calc(100vh - 200px);
+    background: #131316;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: relative;
+    row-gap: 60px;
+}
+
+.status {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}

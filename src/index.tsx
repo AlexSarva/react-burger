@@ -9,19 +9,37 @@ import { configureStore } from '@reduxjs/toolkit'
 // @ts-ignore
 import logger from 'redux-logger'
 import rootReducer from './services/reducers'
-import { Provider } from 'react-redux'
+import { Provider, useDispatch } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { socketMiddleware, SocketType } from './services/middleware/socket-middleware'
+import { onClose, onError, onOpen, setOrdersCnt, updateOrders, wsInit } from './services/reducers/orders'
 
 const queryClient = new QueryClient()
 
+const FEED_URL = 'wss://norma.nomoreparties.space/orders/all'
+const MY_URL = 'wss://norma.nomoreparties.space/orders'
+
 const store = configureStore({
   reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(
+    ...(process.env.NODE_ENV !== 'production' ? [logger] : []),
+    socketMiddleware({
+      wsUrl: FEED_URL,
+      entityType: SocketType.feed,
+      wsActions: { setOrdersCnt, wsInit, onOpen, onError, updateOrders, onClose }
+    }),
+    socketMiddleware({
+      wsUrl: MY_URL,
+      entityType: SocketType.my,
+      wsActions: { setOrdersCnt, wsInit, onOpen, onError, updateOrders, onClose }
+    })),
   devTools: process.env.NODE_ENV !== 'production'
 })
 
 export type FetchDispatch = typeof store.dispatch
+export const useAppDispatch: () => FetchDispatch = useDispatch
+export type RootState = ReturnType<typeof store.getState>
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const rootContainer = document.getElementById('root')!

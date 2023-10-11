@@ -1,13 +1,13 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchOrder } from '../../../services/reducers/orders'
+import { useSelector } from 'react-redux'
+import { fetchOrder } from '../../../services/reducers/order'
 import style from './result-info.module.css'
 import { Button, CurrencyIcon } from '@ya.praktikum/react-developer-burger-ui-components'
 import { RootState } from '../../../services/reducers'
-import { FetchDispatch } from '../../../index'
+import { FetchDispatch, useAppDispatch } from '../../../index'
 
 const ResultInfo = () => {
   const { totalPrice, ingredients } = useSelector((state: RootState) => state.burgerConstructor)
-  const dispatch: FetchDispatch = useDispatch()
+  const dispatch: FetchDispatch = useAppDispatch()
   const handleOrderClick = () => {
     dispatch(fetchOrder({ ingredients }))
   }

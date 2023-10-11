@@ -1,78 +1,222 @@
-import { ingredientsApi, TIngredientOrder, TOrderResponse } from '../../utils/ingredients-api'
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { TErrorResponse } from '../../utils/api-types'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSelector } from 'reselect'
+import { IngredientsState } from './ingredients'
+import { TIngredient } from '../../utils/ingrediens-types'
 
-const { getOrderNumber } = ingredientsApi()
+export type TOrder = {
+  _id: string
+  ingredients: Array<string | null>
+  name: string
+  status: 'done' | 'pending' | 'created'
+  number: number
+  createdAt: string
+  updatedAt: string
+}
+
+export type TOrdersCnt = {
+  total: number
+  totalToday: number
+}
+
+export type TUpdateOrdersCnt = {
+  cnt: TOrdersCnt
+  type: 'feed' | 'my'
+}
+
+export type TMessageOrders = {
+  success: boolean
+  total: number
+  totalToday: number
+  orders: Array<TOrder>
+}
+
+export type TUpdateOrders = {
+  orders: Array<TOrder>
+  type: 'feed' | 'my'
+}
+
+export type TWSSError = {
+  type: 'feed' | 'my'
+  error: Event
+}
+
+export type TExtendedOrder = Omit<TOrder, 'ingredients'> & {
+  ingredients: Array<TIngredient>
+  ingredientsPrice: number
+}
 
 export type OrdersState = {
-  order: {
-    name: string | null,
-    number: number | null,
-  },
-  status: 'idle' | 'loading' | 'succeeded' | 'failed',
-  error: string | null,
-  showOrder: boolean
+  orders: {
+    feed: Array<TOrder>,
+    my: Array<TOrder>
+  }
+  wsConnected: {
+    feed: boolean,
+    my: boolean
+  }
+  wsError: {
+    feed: Event | null,
+    my: Event | null
+  }
+  wsLoading: {
+    feed: boolean,
+    my: boolean
+  }
+  total: {
+    feed: number,
+    my: number
+  }
+  totalToday: {
+    feed: number,
+    my: number
+  }
 }
 
 const initialState: OrdersState = {
-  order: {
-    name: null,
-    number: null
+  orders: {
+    feed: [],
+    my: []
   },
-  status: 'idle',
-  error: null,
-  showOrder: false
+  wsConnected: {
+    feed: false,
+    my: false
+  },
+  wsError: {
+    feed: null,
+    my: null
+  },
+  wsLoading: {
+    feed: false,
+    my: false
+  },
+  total: {
+    feed: 0,
+    my: 0
+  },
+  totalToday: {
+    feed: 0,
+    my: 0
+  }
 }
 
-export const fetchOrder = createAsyncThunk<TOrderResponse, TIngredientOrder, { rejectValue: TErrorResponse }>(
-  'order/fetch',
-  async (ingredients, thunkAPI) => {
-    try {
-      return await getOrderNumber(ingredients)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error)
-    }
-  })
-
-const orderSlice = createSlice({
-  name: 'order',
+const ordersSlice = createSlice({
+  name: 'orders',
   initialState,
   reducers: {
-    clearOrder: (state) => {
-      state.order = {
-        name: null,
-        number: null
-      }
-      state.status = 'idle'
+    wsInit: (state, action: PayloadAction<'my' | 'feed'>) => {
+      state.wsLoading[action.payload] = true
     },
-    hideOrder: (state) => {
-      state.showOrder = false
+    onOpen: (state, action: PayloadAction<'my' | 'feed'>) => {
+      state.wsLoading[action.payload] = false
+      state.wsConnected[action.payload] = true
+    },
+    onError: (state, action: PayloadAction<TWSSError>) => {
+      state.wsLoading[action.payload.type] = false
+      state.wsError[action.payload.type] = action.payload.error
+    },
+    onClose: (state, action: PayloadAction<'my' | 'feed'>) => {
+      state.wsLoading[action.payload] = false
+      state.wsConnected[action.payload] = false
+    },
+    updateOrders: (state, action: PayloadAction<TUpdateOrders>) => {
+      state.orders[action.payload.type] = action.payload.orders
+    },
+    setOrdersCnt: (state, action: PayloadAction<TUpdateOrdersCnt>) => {
+      state.total[action.payload.type] = action.payload.cnt.total
+      state.totalToday[action.payload.type] = action.payload.cnt.totalToday
     }
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchOrder.pending, (state) => {
-        state.status = 'loading'
-        state.error = null
-        state.showOrder = true
-      })
-      .addCase(fetchOrder.fulfilled, (state, action) => {
-        if (action.payload.success) {
-          state.order.name = action.payload.name
-          state.order.number = action.payload.order.number
-          state.status = 'succeeded'
-        } else {
-          state.status = 'failed'
-          state.error = `Error success: ${action.payload.success}`
-        }
-      })
-      .addCase(fetchOrder.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = `${action.error.message} > Error Code ${action.payload?.status}: ${action.payload?.statusText}`
-      })
   }
 })
 
-export const { clearOrder, hideOrder } = orderSlice.actions
-export default orderSlice.reducer
+export const selectFeedOrders = createSelector(
+  (state: { ingredients: IngredientsState }) => state.ingredients.allItems,
+  (state: { orders: OrdersState }) => state.orders.orders.feed,
+  (allItems, orders) => {
+    if (!orders.length) return []
+    if (!allItems || allItems.length === 0) return []
+    return orders.map((order) => {
+      const ingredients = [] as Array<TIngredient>
+      for (const id of order.ingredients) {
+        if (id && id !== '') {
+          const fullInfo = allItems.find((item) => item._id === id)
+          if (typeof fullInfo === 'undefined') {
+            throw new Error(`Unknown ingredient id: ${id}`)
+          }
+          ingredients.push(fullInfo)
+        }
+      }
+
+      const ingredientsPrice = ingredients.reduce(
+        (total: number, option: TIngredient) => total + option.price,
+        0
+      )
+      return {
+        ...order,
+        ingredients,
+        ingredientsPrice
+      }
+    })
+  })
+
+export const selectMyOrders = createSelector(
+  (state: { ingredients: IngredientsState }) => state.ingredients.allItems,
+  (state: { orders: OrdersState }) => state.orders.orders.my,
+  (allItems, orders) => {
+    if (!orders.length) return []
+    if (!allItems || allItems.length === 0) return []
+    return orders.map((order) => {
+      const ingredients = order.ingredients.map((id) => {
+        const fullInfo = allItems.find((item) => item._id === id)
+        if (typeof fullInfo === 'undefined') {
+          throw new Error(`Unknown ingredient id: ${id}`)
+        }
+        return fullInfo
+      })
+      const ingredientsPrice = ingredients.reduce(
+        (total: number, option: TIngredient) => total + option.price,
+        0
+      )
+      return {
+        ...order,
+        ingredients,
+        ingredientsPrice
+      }
+    })
+  })
+
+export const selectFeedTotal = (state: { orders: OrdersState }) => state.orders.total.feed
+export const selectMyTotal = (state: { orders: OrdersState }) => state.orders.total.my
+export const selectFeedTotalToday = (state: { orders: OrdersState }) => state.orders.totalToday.feed
+export const selectMyTotalToday = (state: { orders: OrdersState }) => state.orders.totalToday.my
+
+export const selectPendingOrders = createSelector(
+  (state: { orders: OrdersState }) => state.orders.orders.feed,
+  (orders) => orders.filter((order) => order.status === 'pending'))
+
+export const selectDoneOrders = createSelector(
+  (state: { orders: OrdersState }) => state.orders.orders.feed,
+  (orders) => orders.filter((order) => order.status === 'done'))
+
+export const selectOrderByNumberType = (number: string, type: string) => createSelector(
+  selectFeedOrders,
+  selectMyOrders,
+  (feedOrders, myOrders) => {
+    if (type === 'feed') {
+      return feedOrders.find((order) => {
+        return order.number === Number(number)
+      })
+    }
+    if (type === 'my') {
+      return myOrders.find((order) => {
+        return order.number === Number(number)
+      })
+    }
+    return null
+  }
+)
+
+export const { wsInit, onOpen, onError, updateOrders, onClose, setOrdersCnt } = ordersSlice.actions
+
+export type TFeedActions = typeof ordersSlice.actions
+
+export default ordersSlice.reducer

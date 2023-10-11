@@ -1,6 +1,6 @@
 import style from './burger-ingredients.module.css'
 import { RefObject, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { decrementCount } from '../../services/reducers/ingredients'
 import Preloader from '../preloader/preloader'
 import NoContent from '../no-content/no-content'
@@ -12,6 +12,7 @@ import Ingredients from './ingredients/ingredients'
 import { RootState } from '../../services/reducers'
 import { IngredientType } from '../../utils/ingrediens-types'
 import { TDragConstructorElementExpanded } from '../burger-constructor/drag-constructor-element/drag-constructor-element'
+import { useAppDispatch } from '../../index'
 
 export interface TIngredientsRefs {
   [key: string]: RefObject<HTMLDivElement>;
@@ -22,7 +23,7 @@ type TElementsPositions = {
 }
 
 const BurgerIngredients = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { status } = useSelector((state: RootState) => state.ingredients)
   const { highlightedCategory } = useSelector((state: RootState) => state.nav)
   const ingredientContainerRef = useRef<HTMLDivElement>(null)

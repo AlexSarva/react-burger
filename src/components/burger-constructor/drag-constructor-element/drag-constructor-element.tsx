@@ -1,5 +1,5 @@
 import { FC, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useDrag, useDrop } from 'react-dnd'
 import { addIngredient, onDrop, removeIngredient, setDropIndex } from '../../../services/reducers/burger-constructor'
 import { decrementCount, incrementCount } from '../../../services/reducers/ingredients'
@@ -8,6 +8,7 @@ import { ConstructorElement, DragIcon } from '@ya.praktikum/react-developer-burg
 import { IngredientType, TIngredient } from '../../../utils/ingrediens-types'
 import { RootState } from '../../../services/reducers'
 import { TDragConstructorElement } from '../../burger-ingredients/ingredient/ingredient'
+import { useAppDispatch } from '../../../index'
 
 export type TDragConstructorElementExpanded = TDragConstructorElement & { index: number }
 
@@ -21,7 +22,7 @@ const DragConstructorElement: FC<TDragConstructorElementProps> = ({ index, ingre
   const [pickedType, setPickedType] = useState<IngredientType | null>(null)
   // eslint-disable-next-line camelcase
   const { name, price, image_mobile: imageMobile } = ingredient
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { position } = useSelector((state: RootState) => state.burgerConstructor.dragDropIndexes)
   const [{ isDragging }, dragPicked] = useDrag({
     type: 'pickedIngredient',

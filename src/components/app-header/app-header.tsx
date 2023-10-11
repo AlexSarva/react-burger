@@ -10,7 +10,7 @@ const AppHeader = () => {
           <NavigationLink path={'/'} label={'Конструктор'}>
             <BurgerIcon type={'primary'}/>
           </NavigationLink>
-          <NavigationLink path={'/orders'} label={'Лента заказов'}>
+          <NavigationLink path={'/feed'} label={'Лента заказов'}>
             <ListIcon type={'secondary'}/>
           </NavigationLink>
         </div>

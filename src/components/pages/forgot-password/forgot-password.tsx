@@ -1,14 +1,17 @@
 import style from './forgot-password.module.css'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { Button, EmailInput } from '@ya.praktikum/react-developer-burger-ui-components'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useMutation } from 'react-query'
 import useAuth, { TResetPassword } from '../../../utils/auth-api'
 import Preloader from '../../preloader/preloader'
 import ApiError from '../../api-error/api-error'
+import { onClose } from '../../../services/reducers/orders'
+import { useAppDispatch } from '../../../index'
 
 const ForgotPassword = () => {
   const location = useLocation()
+  const dispatch = useAppDispatch()
   const [state, setState] = useState<TResetPassword>({
     email: ''
   })
@@ -31,6 +34,11 @@ const ForgotPassword = () => {
   if (mutation.isLoading) return <Preloader/>
 
   if (mutation.isError) return <ApiError onRetry={() => mutation.reset()} message={mutation.error}/>
+
+  useEffect(() => {
+    dispatch(onClose('feed'))
+    dispatch(onClose('my'))
+  }, [dispatch, onClose])
 
   return (
     <>
